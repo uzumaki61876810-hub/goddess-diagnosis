@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>女神診断 ─ 魂の進化サイクル</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+:root {
+  --bg: #08070f;
+  --surface: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.08);
+  --border-gold: rgba(196,160,80,0.3);
+  --gold: #c4a050;
+  --gold-bright: #e8c97a;
+  --gold-dim: #6b5520;
+  --silver: #a8b8c8;
+  --text: #e8e0d4;
+  --text-dim: #8090a0;
+  --crimson: #6b1a28;
+  --phase1: rgba(196,160,80,0.7);
+  --phase2: rgba(100,190,160,0.7);
+  --phase3: rgba(220,140,80,0.7);
+  --phase4: rgba(170,110,200,0.7);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+#bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6;}
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:0 20px 80px;}
+/* ── HEADER ── */
+.site-header{text-align:center;padding:80px 0 60px;}
+.site-header .en{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;letter-spacing:0.5em;color:var(--gold-dim);margin-bottom:20px;display:block;}
+.site-header h1{font-family:'Zen Old Mincho',serif;font-size:clamp(28px,6vw,48px);font-weight:900;color:var(--gold);letter-spacing:0.15em;line-height:1.2;text-shadow:0 0 60px rgba(196,160,80,0.3);}
+.site-header .tagline{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--silver);margin-top:16px;letter-spacing:0.2em;}
+.header-line{width:1px;height:60px;background:linear-gradient(to bottom,transparent,var(--gold-dim),transparent);margin:30px auto 0;}
+/* ── PANEL ── */
+.panel{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border-gold);padding:36px 32px;margin-bottom:20px;position:relative;}
+@media(max-width:480px){.panel{padding:24px 20px;}}
+.panel-title{font-family:'Zen Old Mincho',serif;font-size:16px;color:var(--gold);letter-spacing:0.2em;margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+.step-no{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.3em;color:var(--bg);background:var(--gold-dim);padding:3px 12px;}
+/* ── FORM ── */
+.field{margin-bottom:20px;}
+.field label{display:block;font-size:12px;letter-spacing:0.2em;color:var(--text-dim);margin-bottom:8px;}
+.field input,.field select{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-bottom:1px solid var(--border-gold);color:var(--text);padding:12px 16px;font-family:'Noto Sans JP',sans-serif;font-size:14px;outline:none;-webkit-appearance:none;border-radius:0;transition:border-color 0.3s;}
+.field input:focus,.field select:focus{border-color:var(--gold-dim);background:rgba(196,160,80,0.04);}
+.field select option{background:#1a1520;}
+.field-note{font-size:11px;color:var(--gold-dim);margin-top:6px;letter-spacing:0.05em;line-height:1.6;}
+/* ── ZODIAC PREVIEW ── */
+.zodiac-preview{display:none;margin-top:24px;border-top:1px solid var(--border);padding-top:24px;}
+.zodiac-preview.visible{display:block;}
+.zodiac-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.zodiac-card{padding:20px 16px;border:1px solid var(--border);border-top:2px solid var(--border-gold);text-align:center;}
+.zodiac-card .role{font-size:10px;letter-spacing:0.3em;color:var(--gold-dim);margin-bottom:10px;}
+.zodiac-card .sign{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--silver);margin-bottom:6px;letter-spacing:0.15em;}
+.zodiac-card .goddess{font-family:'Zen Old Mincho',serif;font-size:22px;color:var(--gold);font-weight:700;}
+.zodiac-card .theme{font-size:12px;color:var(--text-dim);margin-top:6px;letter-spacing:0.1em;}
+.moon-note{font-size:11px;color:var(--gold-dim);margin-top:12px;line-height:1.6;text-align:center;}
+/* ── QUESTIONS ── */
+.q-intro{font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:20px;padding:12px 16px;border-left:2px solid var(--gold-dim);background:rgba(196,160,80,0.04);letter-spacing:0.05em;}
+.q-intro-goddess{font-family:'Zen Old Mincho',serif;color:var(--gold);font-size:14px;font-weight:700;}
+.q-block{padding:20px 0;border-bottom:1px solid var(--border);}
+.q-block:last-of-type{border-bottom:none;}
+.q-no{font-family:'Cormorant Garamond',serif;font-size:11px;color:var(--gold-dim);letter-spacing:0.3em;margin-bottom:6px;}
+.q-text{font-size:14px;line-height:1.8;color:var(--text);margin-bottom:14px;}
+.likert{display:flex;gap:4px;}
+.likert label{flex:1;cursor:pointer;}
+.likert input{display:none;}
+.l-btn{display:block;text-align:center;padding:10px 4px;border:1px solid var(--border);font-size:11px;color:var(--text-dim);transition:all 0.2s;line-height:1.4;}
+.likert input:checked+.l-btn{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-bright);font-weight:500;}
+.likert label:hover .l-btn{border-color:var(--gold-dim);color:var(--silver);}
+.prog-wrap{margin:0 0 20px;}
+.prog-bar{height:1px;background:var(--border);position:relative;margin-top:6px;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width 0.4s;}
+.prog-label{font-size:11px;color:var(--text-dim);}
+/* ── BTN ── */
+.btn{display:block;width:100%;padding:16px;margin-top:28px;font-family:'Zen Old Mincho',serif;font-size:15px;letter-spacing:0.3em;cursor:pointer;border:none;transition:all 0.3s;text-align:center;}
+.btn-main{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);font-weight:700;}
+.btn-main:hover{background:linear-gradient(135deg,var(--gold),var(--gold-bright));box-shadow:0 0 40px rgba(196,160,80,0.25);}
+.btn-sub{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);font-size:12px;padding:10px;display:inline-block;width:auto;margin-top:0;}
+.btn-sub:hover{background:rgba(196,160,80,0.06);}
+.btn-x{background:#000;border:1px solid #333;color:#fff;font-size:12px;padding:10px 20px;display:inline-block;width:auto;margin-top:0;font-family:'Noto Sans JP',sans-serif;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;}
+/* ── RESULT HERO ── */
+.goddess-hero{text-align:center;padding:48px 20px 32px;position:relative;}
+.goddess-hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(196,160,80,0.08),transparent 70%);pointer-events:none;}
+.hero-glyph{font-size:56px;margin-bottom:16px;display:block;filter:drop-shadow(0 0 20px rgba(196,160,80,0.4));}
+.hero-label{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:0.4em;color:var(--gold-dim);margin-bottom:8px;}
+.hero-name{font-family:'Zen Old Mincho',serif;font-size:clamp(32px,7vw,52px);font-weight:900;color:var(--gold);text-shadow:0 0 40px rgba(196,160,80,0.4);letter-spacing:0.1em;}
+.hero-theme{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--silver);margin-top:10px;letter-spacing:0.15em;}
+.hero-copy{font-size:15px;line-height:1.9;color:var(--text);margin-top:20px;font-weight:300;}
+/* ── PHASE BAR ── */
+.phase-bar{display:flex;align-items:stretch;margin:24px 0;gap:0;border:1px solid var(--border);}
+.phase-item{flex:1;padding:14px 8px;text-align:center;border-right:1px solid var(--border);transition:all 0.3s;position:relative;}
+.phase-item:last-child{border-right:none;}
+.phase-num{font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:4px;}
+.phase-name{font-family:'Zen Old Mincho',serif;font-size:12px;color:var(--text-dim);letter-spacing:0.1em;}
+.phase-sub{font-size:9px;color:var(--text-dim);margin-top:3px;letter-spacing:0.05em;opacity:0.6;}
+.phase-item.active{background:rgba(196,160,80,0.06);}
+.phase-item.active .phase-num{color:var(--gold);}
+.phase-item.active .phase-name{color:var(--gold-bright);}
+.phase-item.active .phase-sub{color:var(--gold-dim);opacity:1;}
+.phase-item.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);}
+.phase-item.p1.active::after{background:var(--phase1);}
+.phase-item.p2.active::after{background:var(--phase2);}
+.phase-item.p3.active::after{background:var(--phase3);}
+.phase-item.p4.active::after{background:var(--phase4);}
+@media(max-width:480px){.phase-name{font-size:10px;}.phase-item{padding:10px 4px;}}
+/* ── EVOLUTION STATUS ── */
+.evo-status-panel{padding:24px;border:1px solid var(--border);border-top:2px solid var(--border-gold);margin:0 0 20px;background:rgba(196,160,80,0.02);}
+.evo-status-label{font-size:10px;letter-spacing:0.35em;color:var(--gold-dim);margin-bottom:10px;}
+.evo-cycle{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--silver);letter-spacing:0.15em;margin-bottom:14px;}
+.evo-tier{font-family:'Zen Old Mincho',serif;font-size:20px;color:var(--gold-bright);margin-bottom:6px;letter-spacing:0.1em;}
+.evo-tier-desc{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:18px;}
+.evo-tier.tier-1{color:rgba(220,160,160,0.9);}
+.evo-tier.tier-2{color:rgba(220,190,120,0.9);}
+.evo-tier.tier-3{color:var(--silver);}
+.evo-tier.tier-4{color:var(--gold-bright);}
+.evo-detail{border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:12px;}
+.evo-row{display:flex;gap:16px;align-items:flex-start;}
+.evo-lbl{font-size:10px;letter-spacing:0.2em;color:var(--text-dim);white-space:nowrap;min-width:72px;padding-top:2px;}
+.evo-val{font-size:13px;color:var(--silver);line-height:1.7;}
+/* ── TWO-COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;}
+@media(max-width:480px){.two-col{grid-template-columns:1fr;}}
+.info-box{padding:20px 16px;border:1px solid var(--border);text-align:center;}
+.info-box .lbl{font-size:10px;letter-spacing:0.3em;color:var(--gold-dim);margin-bottom:10px;}
+.info-box .val{font-family:'Zen Old Mincho',serif;font-size:18px;color:var(--gold-bright);font-weight:700;}
+.info-box .sub{font-size:11px;color:var(--text-dim);margin-top:5px;letter-spacing:0.1em;}
+/* ── MYTHOLOGY ── */
+.myth-section{margin:20px 0;}
+.myth-tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);}
+.myth-tab{padding:10px 20px;font-size:12px;letter-spacing:0.15em;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;user-select:none;}
+.myth-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.myth-tab:hover:not(.active){color:var(--silver);}
+.myth-panel{display:none;padding:24px;border:1px solid var(--border);border-top:none;background:rgba(255,255,255,0.01);}
+.myth-panel.active{display:block;}
+.myth-source{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;letter-spacing:0.3em;color:var(--gold-dim);margin-bottom:14px;}
+.myth-story{font-size:13px;color:var(--text-dim);line-height:2;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.myth-connect-label{font-size:10px;letter-spacing:0.3em;color:var(--gold-dim);margin-bottom:10px;}
+.myth-connect{font-size:14px;color:var(--silver);line-height:1.9;}
+/* ── SHADOW ── */
+.shadow-section{padding:28px 24px;border:1px solid var(--border);border-left:2px solid var(--crimson);margin:20px 0;background:rgba(107,26,40,0.06);}
+.shadow-label{font-size:11px;letter-spacing:0.3em;color:rgba(196,100,100,0.6);margin-bottom:14px;}
+.shadow-goddess{font-family:'Zen Old Mincho',serif;font-size:22px;color:rgba(220,160,160,0.9);margin-bottom:8px;}
+.shadow-theme{font-size:13px;color:var(--text-dim);}
+.shadow-tension{margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05);}
+.shadow-tension .t-label{font-size:11px;color:var(--text-dim);letter-spacing:0.15em;margin-bottom:6px;}
+.shadow-tension .t-val{font-size:14px;color:var(--silver);line-height:1.7;}
+/* ── TWO PATHS (光・闇) ── */
+.two-path-panel{margin:20px 0;border:1px solid var(--border);position:relative;}
+.two-path-panel::before{content:'魂の二つの道';position:absolute;top:-10px;left:24px;background:var(--bg);padding:0 10px;font-size:10px;letter-spacing:0.3em;color:var(--text-dim);}
+.path-row{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+@media(max-width:480px){.path-row{grid-template-columns:1fr;}}
+.path-light{padding:24px 20px;border-right:1px solid var(--border);background:rgba(100,190,150,0.03);}
+@media(max-width:480px){.path-light{border-right:none;border-bottom:1px solid var(--border);}}
+.path-dark{padding:24px 20px;background:rgba(107,26,40,0.05);}
+.path-dir{font-size:10px;letter-spacing:0.35em;margin-bottom:10px;}
+.path-light .path-dir{color:rgba(100,190,160,0.7);}
+.path-dark .path-dir{color:rgba(196,100,100,0.6);}
+.path-arrow{font-family:'Cormorant Garamond',serif;font-size:11px;margin-bottom:4px;}
+.path-light .path-arrow{color:rgba(100,190,160,0.5);}
+.path-dark .path-arrow{color:rgba(196,100,100,0.4);}
+.path-goddess{font-family:'Zen Old Mincho',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+.path-light .path-goddess{color:rgba(160,220,200,0.9);}
+.path-dark .path-goddess{color:rgba(220,160,160,0.9);}
+.path-theme{font-size:12px;letter-spacing:0.1em;margin-bottom:10px;}
+.path-light .path-theme{color:rgba(100,190,160,0.6);}
+.path-dark .path-theme{color:rgba(196,100,100,0.5);}
+.path-desc{font-size:13px;color:var(--text-dim);line-height:1.9;padding:12px 14px;border-left:2px solid;}
+.path-light .path-desc{border-left-color:rgba(100,190,160,0.3);background:rgba(100,190,160,0.03);}
+.path-dark .path-desc{border-left-color:rgba(196,100,100,0.3);background:rgba(107,26,40,0.04);}
+.path-advice{font-size:12px;line-height:1.7;margin-top:10px;font-style:italic;}
+.path-light .path-advice{color:rgba(100,190,160,0.7);}
+.path-dark .path-advice{color:rgba(196,100,100,0.6);}
+.path-ennea{padding:10px 20px 0;display:flex;align-items:center;gap:8px;}
+.path-ennea-type{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:0.25em;color:var(--gold-dim);border:1px solid var(--border-gold);padding:4px 14px;}
+/* ── NEXT STEP (legacy) ── */
+.next-step-panel{display:none;}
+.next-label,.next-goddess-name,.next-theme,.next-phase,.next-advice{display:none;}
+/* ── KOTODAMA ── */
+.kotodama{padding:32px 28px;border:1px solid var(--border-gold);background:rgba(196,160,80,0.03);text-align:center;margin:20px 0;position:relative;}
+.kotodama::before{content:'言霊';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 12px;font-size:10px;letter-spacing:0.3em;color:var(--gold-dim);}
+.kotodama-text{font-family:'Zen Old Mincho',serif;font-size:clamp(15px,3vw,19px);color:var(--gold-bright);line-height:1.9;font-weight:500;}
+/* ── PROFILE ── */
+.profile-section{margin:20px 0;}
+.profile-row{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border);gap:16px;}
+.profile-row:last-child{border-bottom:none;}
+.p-label{font-size:11px;color:var(--text-dim);letter-spacing:0.15em;white-space:nowrap;padding-top:2px;min-width:80px;}
+.p-val{font-size:14px;color:var(--silver);line-height:1.7;}
+/* ── PREMIUM REPORT ── */
+.premium-panel{margin:20px 0;border:1px solid var(--border-gold);background:rgba(196,160,80,0.02);position:relative;}
+.premium-panel::before{content:'詳細プロフィール';position:absolute;top:-10px;left:24px;background:var(--bg);padding:0 10px;font-size:10px;letter-spacing:0.3em;color:var(--gold-dim);}
+.prem-section{padding:22px 24px;border-bottom:1px solid var(--border);}
+.prem-section:last-child{border-bottom:none;}
+.prem-label{font-size:10px;letter-spacing:0.35em;color:var(--gold-dim);margin-bottom:10px;}
+.prem-heading{font-family:'Zen Old Mincho',serif;font-size:14px;color:var(--gold);margin-bottom:10px;letter-spacing:0.1em;}
+.prem-text{font-size:13px;color:var(--text-dim);line-height:2;}
+.compat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;}
+@media(max-width:480px){.compat-grid{grid-template-columns:1fr;}}
+.compat-box{padding:14px;border:1px solid var(--border);}
+.compat-box.good{border-top:2px solid rgba(100,190,160,0.5);}
+.compat-box.avoid{border-top:2px solid rgba(200,80,80,0.4);}
+.compat-type{font-size:10px;letter-spacing:0.25em;margin-bottom:8px;}
+.compat-box.good .compat-type{color:rgba(100,190,160,0.7);}
+.compat-box.avoid .compat-type{color:rgba(200,80,80,0.5);}
+.compat-names{font-family:'Zen Old Mincho',serif;font-size:13px;color:var(--silver);line-height:1.8;}
+/* ── ERROR ── */
+.err{font-size:12px;color:#e07070;margin-top:8px;display:none;}
+.err.on{display:block;}
+/* ── HISTORY ── */
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid var(--border);margin-bottom:6px;font-size:13px;}
+.hist-goddess{color:var(--gold-bright);font-family:'Zen Old Mincho',serif;}
+.hist-meta{font-size:11px;color:var(--text-dim);}
+/* ── SCREEN ── */
+.screen{animation:fadeUp 0.5s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+/* ── FOOTER ── */
+footer{text-align:center;padding:48px 0 20px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:0.3em;color:var(--gold-dim);}
+/* ══════════════════════════════════════
+   PRINT / PDF  @media print
+══════════════════════════════════════ */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  #bg-canvas,header.site-header,#s-top,#s-birth,#s-questions,.btn-row,footer{display:none!important;}
+  #s-result{display:block!important;}
+  body,html{background:#fff!important;color:#1a1010!important;}
+  .wrap{max-width:100%!important;padding:0 16px!important;}
+
+  /* ── ページ区切り制御 ── */
+  /* 要素の途中で分割しない */
+  .panel,.evo-status-panel,.shadow-section,.two-path-panel,
+  .kotodama,.myth-panel,.info-box,.premium-panel,
+  .prem-section,.compat-grid,.path-row{
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  /* ヒーロー＋フェーズバーは1ページ目に収める */
+  .goddess-hero,.phase-bar{
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  /* 主要セクションの前で改ページ候補 */
+  .myth-section{break-before:auto;page-break-before:auto;}
+  .shadow-section{break-before:auto;page-break-before:auto;}
+  .two-path-panel{break-before:auto;page-break-before:auto;}
+  .premium-panel{break-before:page!important;page-break-before:always!important;}
+  /* 神話タブパネルは分割しない */
+  .myth-tab-row,.myth-panel.active{
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  /* グリッド（2カラム）は分割しない */
+  .two-col,.compat-grid,.path-row{
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  /* CSS変数を上書き */
+  :root{
+    --bg:#fff;--surface:rgba(0,0,0,0.02);--border:rgba(0,0,0,0.12);
+    --border-gold:rgba(140,100,0,0.35);--gold:#7a4800;--gold-bright:#5a3000;
+    --gold-dim:#9a6a20;--silver:#303020;--text:#1a1010;--text-dim:#4a4030;
+    --crimson:#7a1828;--phase1:rgba(150,110,0,0.8);--phase2:rgba(0,130,100,0.8);
+    --phase3:rgba(180,90,0,0.8);--phase4:rgba(120,60,160,0.8);
+  }
+  .panel{border:1px solid #c8b060!important;background:#fffdf5!important;}
+  .goddess-hero::before{display:none;}
+  .hero-name{color:#7a4800!important;text-shadow:none!important;}
+  .hero-theme{color:#9a6a20!important;}
+  .hero-copy{color:#3a3020!important;}
+  .evo-status-panel{background:#fffdf5!important;border-color:#c8b060!important;}
+  .evo-cycle,.evo-val{color:#3a3020!important;}
+  .evo-tier{color:#7a4800!important;}
+  .evo-lbl{color:#7a5520!important;}
+  .info-box{border-color:#c8b060!important;background:#fff!important;}
+  .info-box .lbl{color:#9a6a20!important;}
+  .info-box .val{color:#7a4800!important;}
+  .info-box .sub{color:#6a6040!important;}
+  /* ── タブを全て展開して表示（選択に関わらず両方印刷） ── */
+  .myth-tab-row{display:none!important;}
+  .myth-panel{display:block!important;background:#fffdf5!important;border:1px solid #c8b060!important;margin-bottom:10px!important;break-inside:avoid!important;page-break-inside:avoid!important;}
+  .myth-panel+.myth-panel{border-top:2px dashed #d4c090!important;}
+  .myth-source{color:#9a6a20!important;}
+  .myth-story,.myth-connect{color:#4a4030!important;}
+  .myth-connect-label{color:#9a6a20!important;}
+  /* ── エニアグラムタイプ ── */
+  .path-ennea{padding:8px 16px 0!important;}
+  .path-ennea-type{color:#7a4800!important;border-color:#c8b060!important;font-size:11px!important;}
+  .path-light .path-advice{color:#1a6040!important;}
+  .path-dark .path-advice{color:#7a1828!important;}
+  .shadow-section{background:#fff5f5!important;border-left-color:#7a1828!important;border-color:#e0b0b0!important;}
+  .shadow-label{color:#9a4040!important;}
+  .shadow-goddess{color:#7a1828!important;}
+  .shadow-theme,.t-val{color:#4a3030!important;}
+  .t-label{color:#7a5050!important;}
+  .two-path-panel{border-color:#c8b060!important;}
+  .two-path-panel::before{color:#7a5520!important;background:#fff!important;}
+  .path-light{background:#f0faf5!important;border-right-color:#c8b060!important;}
+  .path-dark{background:#fff5f5!important;}
+  .path-light .path-dir{color:#1a6040!important;}
+  .path-dark .path-dir{color:#7a1828!important;}
+  .path-light .path-goddess{color:#1a6040!important;}
+  .path-dark .path-goddess{color:#7a1828!important;}
+  .path-light .path-theme{color:#2a7050!important;}
+  .path-dark .path-theme{color:#8a2838!important;}
+  .path-light .path-desc{color:#2a3020!important;background:#e8f8f0!important;border-left-color:#1a6040!important;}
+  .path-dark .path-desc{color:#3a1010!important;background:#fde8e8!important;border-left-color:#7a1828!important;}
+  .path-light .path-advice{color:#1a6040!important;}
+  .path-dark .path-advice{color:#7a1828!important;}
+  .kotodama{background:#fffde8!important;border-color:#c8a820!important;}
+  .kotodama::before{background:#fff!important;color:#9a6a20!important;}
+  .kotodama-text{color:#7a4800!important;}
+  .profile-section .p-label{color:#7a5520!important;}
+  .profile-section .p-val{color:#3a3020!important;}
+  .profile-row{border-bottom-color:#ddd!important;}
+  .premium-panel{border-color:#c8b060!important;background:#fffdf5!important;}
+  .premium-panel::before{background:#fff!important;color:#9a6a20!important;}
+  .prem-section{border-bottom-color:#e8d890!important;}
+  .prem-label{color:#9a6a20!important;}
+  .prem-text{color:#3a3020!important;}
+  .compat-box{border-color:#c8b060!important;background:#fff!important;}
+  .compat-box.good{border-top-color:#1a8050!important;}
+  .compat-box.avoid{border-top-color:#8a2030!important;}
+  .compat-box.good .compat-type{color:#1a6040!important;}
+  .compat-box.avoid .compat-type{color:#8a2030!important;}
+  .compat-names{color:#2a2018!important;}
+  .phase-item{border-color:#e0d090!important;}
+  .phase-name,.phase-num,.phase-sub{color:#6a6040!important;}
+  .phase-item.active{background:#fffde0!important;}
+  .phase-item.active .phase-name{color:#7a4800!important;}
+  .phase-item.active .phase-num{color:#9a6a20!important;}
+}
+/* ── Stripe課金パネル ── */
+.stripe-panel{border:1px solid var(--border-gold);background:linear-gradient(135deg,rgba(196,160,80,0.06),rgba(120,60,160,0.06));padding:24px 28px;margin-bottom:20px;}
+.stripe-panel-title{font-family:'Zen Old Mincho',serif;font-size:15px;color:var(--gold);letter-spacing:0.2em;margin-bottom:10px;}
+.stripe-panel-desc{font-size:12px;color:var(--text-dim);line-height:1.8;margin-bottom:16px;}
+.btn-buy{width:100%;padding:14px;background:linear-gradient(135deg,#c4a050,#8a5a20);border:none;color:#fff8e8;font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:0.2em;cursor:pointer;transition:opacity 0.2s;}
+.btn-buy:hover{opacity:0.85;}
+.btn-buy-price{font-size:11px;opacity:0.8;margin-left:8px;}
+.btn-dl-premium{width:100%;padding:14px;background:linear-gradient(135deg,#3a8060,#1a5040);border:none;color:#e8fff8;font-family:'Zen Old Mincho',serif;font-size:15px;letter-spacing:0.15em;cursor:pointer;transition:opacity 0.2s;}
+.btn-dl-premium:hover{opacity:0.85;}
+.paid-note{font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;letter-spacing:0.05em;}
+/* ── 3ヶ月リマインダーバナー ── */
+.remind-banner{display:none;background:linear-gradient(135deg,rgba(196,160,80,0.12),rgba(120,80,160,0.12));border:1px solid var(--border-gold);padding:20px 24px;margin-bottom:24px;position:relative;}
+.remind-banner.show{display:block;}
+.remind-banner-title{font-family:'Zen Old Mincho',serif;font-size:16px;color:var(--gold);letter-spacing:0.15em;margin-bottom:8px;}
+.remind-banner-body{font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:14px;}
+.remind-banner-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;padding:0;}
+.remind-banner .btn-remind{display:inline-block;padding:8px 20px;border:1px solid var(--gold-dim);color:var(--gold);font-size:12px;letter-spacing:0.15em;background:rgba(196,160,80,0.08);cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.remind-banner .btn-remind:hover{background:rgba(196,160,80,0.16);}
+/* ── カレンダー登録カード ── */
+.cal-card{margin-top:20px;padding:18px 20px;border:1px solid var(--border-gold);background:rgba(196,160,80,0.04);}
+.cal-card-title{font-size:12px;color:var(--gold-dim);letter-spacing:0.2em;margin-bottom:12px;}
+.cal-card-date{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);letter-spacing:0.1em;margin-bottom:12px;}
+.cal-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.cal-btn{padding:8px 16px;border:1px solid var(--border-gold);color:var(--gold-dim);font-size:11px;letter-spacing:0.15em;background:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
+.cal-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(196,160,80,0.08);}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="wrap">
+<!-- ══ 3ヶ月リマインダーバナー ══ -->
+<div id="remind-banner" class="remind-banner">
+  <button class="remind-banner-close" onclick="closeBanner()">×</button>
+  <div class="remind-banner-title">✦ 魂の進化を確かめるとき</div>
+  <div class="remind-banner-body" id="remind-banner-body"></div>
+  <button class="btn-remind" onclick="retakeFromBanner()">→ もう一度、診断を受ける</button>
+</div>
+<!-- ══ HEADER ══ -->
+<header class="site-header">
+  <span class="en">Twelve Goddess · Soul Evolution Cycle</span>
+  <h1>女神診断</h1>
+  <p class="tagline">魂の進化サイクルで、今の現在地を知る</p>
+  <div class="header-line"></div>
+</header>
+<!-- ══ SCREEN: TOP ══ -->
+<div id="s-top" class="screen">
+  <div class="panel">
+    <p style="font-size:14px;line-height:2;color:var(--text-dim);text-align:center;">
+      12柱の女神が織りなす「魂の進化サイクル」。<br>
+      あなたの現在地と、次へ向かう道を照らします。
+    </p>
+    <div style="margin:28px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);">
+      <div style="padding:16px 6px;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:9px;letter-spacing:0.3em;color:var(--phase1);margin-bottom:6px;">Phase 1</div>
+        <div style="font-size:11px;color:var(--text-dim);">自己の確立</div>
+      </div>
+      <div style="padding:16px 6px;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:9px;letter-spacing:0.3em;color:var(--phase2);margin-bottom:6px;">Phase 2</div>
+        <div style="font-size:11px;color:var(--text-dim);">他者との調和</div>
+      </div>
+      <div style="padding:16px 6px;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:9px;letter-spacing:0.3em;color:var(--phase3);margin-bottom:6px;">Phase 3</div>
+        <div style="font-size:11px;color:var(--text-dim);">自己表現</div>
+      </div>
+      <div style="padding:16px 6px;text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:9px;letter-spacing:0.3em;color:var(--phase4);margin-bottom:6px;">Phase 4</div>
+        <div style="font-size:11px;color:var(--text-dim);">統合と再生</div>
+      </div>
+    </div>
+    <button class="btn btn-main" onclick="go('birth')">診断をはじめる</button>
+  </div>
+  <div id="hist-panel" style="display:none;" class="panel">
+    <div class="panel-title">過去の記録</div>
+    <div id="hist-list"></div>
+  </div>
+</div>
+<!-- ══ SCREEN: BIRTH ══ -->
+<div id="s-birth" class="screen" style="display:none;">
+  <div class="panel">
+    <div class="panel-title"><span class="step-no">I</span>生まれた日時・場所</div>
+    <div class="field">
+      <label>生年月日</label>
+      <input type="date" id="f-date" min="1920-01-01" max="2010-12-31" onchange="onBirthChange()">
+    </div>
+    <div class="field">
+      <label>生まれた時刻</label>
+      <input type="time" id="f-time" value="12:00" onchange="onBirthChange()">
+      <p class="field-note">不明な場合は 12:00 のまま。月星座は約2.5日で移動するため、時刻により結果が変わる場合があります。</p>
+    </div>
+    <div class="field">
+      <label>生まれた場所</label>
+      <select id="f-place" onchange="onBirthChange()">
+        <optgroup label="日本">
+          <option value="135,43">北海道・東北</option>
+          <option value="140,36">関東（東京・神奈川など）</option>
+          <option value="136,35" selected>中部・近畿（名古屋・大阪・京都など）</option>
+          <option value="133,34">中国・四国</option>
+          <option value="130,33">九州</option>
+          <option value="128,26">沖縄・南西諸島</option>
+        </optgroup>
+        <optgroup label="海外">
+          <option value="0,51">ロンドン</option>
+          <option value="-74,41">ニューヨーク</option>
+          <option value="-118,34">ロサンゼルス</option>
+          <option value="2,49">パリ</option>
+          <option value="116,40">北京・東アジア</option>
+          <option value="103,1">シンガポール・東南アジア</option>
+          <option value="151,-34">シドニー</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="zodiac-preview" id="zodiac-preview">
+      <div class="zodiac-grid">
+        <div class="zodiac-card">
+          <div class="role">☀ 太陽女神（主）</div>
+          <div class="sign" id="pv-sun-sign"></div>
+          <div class="goddess" id="pv-sun-goddess"></div>
+          <div class="theme" id="pv-sun-theme"></div>
+        </div>
+        <div class="zodiac-card" style="border-top-color:rgba(200,100,100,0.3);">
+          <div class="role">☽ 月女神（影）</div>
+          <div class="sign" id="pv-moon-sign"></div>
+          <div class="goddess" id="pv-moon-goddess"></div>
+          <div class="theme" id="pv-moon-theme"></div>
+        </div>
+      </div>
+      <p class="moon-note" id="pv-note"></p>
+    </div>
+    <div class="err" id="err-birth">生年月日を入力してください</div>
+    <button class="btn btn-main" onclick="goBirth()">次へ：心理テスト →</button>
+  </div>
+</div>
+<!-- ══ SCREEN: QUESTIONS ══ -->
+<div id="s-questions" class="screen" style="display:none;">
+  <div class="panel">
+    <div class="panel-title"><span class="step-no">II</span>影の自己診断 ─ 12問</div>
+    <div id="q-intro" class="q-intro"></div>
+    <div class="prog-wrap">
+      <div class="prog-label" id="prog-label">0 / 12</div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div id="q-list"></div>
+    <div class="err" id="err-q">全ての質問に回答してください</div>
+    <button class="btn btn-main" onclick="goResult()">✦ 結果を見る</button>
+  </div>
+</div>
+<!-- ══ SCREEN: RESULT ══ -->
+<div id="s-result" class="screen" style="display:none;">
+  <div id="result-content">
+  <div class="panel">
+    <!-- Hero -->
+    <div class="goddess-hero">
+      <span class="hero-glyph" id="r-glyph"></span>
+      <div class="hero-label" id="r-label"></div>
+      <div class="hero-name" id="r-name"></div>
+      <div class="hero-theme" id="r-theme"></div>
+      <div class="hero-copy" id="r-copy"></div>
+    </div>
+    <!-- Phase Indicator -->
+    <div id="r-phase-bar" class="phase-bar"></div>
+    <!-- Evolution Status -->
+    <div id="r-evo-status" class="evo-status-panel"></div>
+    <!-- Sun / Moon boxes -->
+    <div class="two-col">
+      <div class="info-box">
+        <div class="lbl">☀ 太陽女神（本質）</div>
+        <div class="val" id="r-sun"></div>
+        <div class="sub" id="r-sun-sign"></div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">☽ 月女神（影）</div>
+        <div class="val" id="r-moon"></div>
+        <div class="sub" id="r-moon-sign"></div>
+      </div>
+    </div>
+    <!-- Mythology Section -->
+    <div class="myth-section" id="r-myth-section"></div>
+    <!-- Shadow section -->
+    <div class="shadow-section">
+      <div class="shadow-label">☽ 月の女神 ─ 影のテーマ</div>
+      <div class="shadow-goddess" id="r-shadow-name"></div>
+      <div class="shadow-theme" id="r-shadow-theme"></div>
+      <div class="shadow-tension">
+        <div class="t-label">緊張すると…</div>
+        <div class="t-val" id="r-tension"></div>
+        <div class="t-label" style="margin-top:12px;">内側の恐れ…</div>
+        <div class="t-val" id="r-fear"></div>
+        <div class="t-label" style="margin-top:12px;">守っているもの…</div>
+        <div class="t-val" id="r-guard"></div>
+      </div>
+    </div>
+    <!-- Two Paths: 光（進化）& 闇（退行） -->
+    <div id="r-two-path" class="two-path-panel"></div>
+    <!-- Next Evolution Step (legacy hidden) -->
+    <div id="r-next-step" class="next-step-panel"></div>
+    <!-- Kotodama -->
+    <div class="kotodama">
+      <div class="kotodama-text" id="r-kotodama"></div>
+    </div>
+    <!-- Flair copy -->
+    <div class="profile-section">
+      <div class="profile-row">
+        <span class="p-label">本質コピー</span>
+        <span class="p-val" id="r-hook"></span>
+      </div>
+      <div class="profile-row">
+        <span class="p-label">女神のささやき</span>
+        <span class="p-val" id="r-whisper"></span>
+      </div>
+      <div class="profile-row">
+        <span class="p-label">イメージカラー</span>
+        <span class="p-val" id="r-color"></span>
+      </div>
+    </div>
+    <!-- Premium Report -->
+    <div id="r-premium" class="premium-panel"></div>
+    <!-- カレンダー登録カード -->
+    <div id="cal-card" class="cal-card" style="display:none;">
+      <div class="cal-card-title">✦ 3ヶ月後の再診断を登録する</div>
+      <div class="cal-card-date" id="cal-next-date"></div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.7;">魂の進化サイクルを追うには、3ヶ月ごとの記録が効果的です。<br>今日のうちにカレンダーに残しておきましょう。</div>
+      <div class="cal-btns">
+        <button class="cal-btn" onclick="addGoogleCal()">Googleカレンダー</button>
+        <button class="cal-btn" onclick="dlICS()">カレンダーに追加（.ics）</button>
+      </div>
+    </div>
+    <!-- 課金UI -->
+    <div id="stripe-panel" class="stripe-panel">
+      <div class="stripe-panel-title">✦ 女神からの手紙 ─ 詳細PDFレポート</div>
+      <div class="stripe-panel-desc">女神があなたに語りかける個人メッセージ、今後3ヶ月の魂の課題、覚醒のワークを収録した詳細PDFです。</div>
+      <div id="stripe-btn-area"><!-- JS で差し替え --></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-x" onclick="shareX()">𝕏 シェア</button>
+      <button class="btn btn-sub" onclick="retake()">再診断</button>
+    </div>
+  </div>
+  </div>
+</div>
+<footer>— 女神診断 · 魂の進化サイクル —</footer>
+</div>
+<script>
+/* ══════════════════════════════════════
+   PHASES
+══════════════════════════════════════ */
+const PHASES = [
+  {no:1, title:'自己の確立', sub:'生存と安全', cssClass:'p1'},
+  {no:2, title:'他者との調和', sub:'交流と愛', cssClass:'p2'},
+  {no:3, title:'自己表現', sub:'魅力と真実', cssClass:'p3'},
+  {no:4, title:'統合と再生', sub:'超越', cssClass:'p4'},
+];
+
+/* ══════════════════════════════════════
+   GODDESS DATA
+   cyclePos: 進化サイクル上の位置（1〜12）
+   phase: フェーズ（1〜4）
+   nextIdx: 次に進化する女神のインデックス
+   myth: 代表的な逸話
+   mythSource: 出典
+   mythConnect: コンセプトとの接点
+══════════════════════════════════════ */
+const GODDESSES = [
+  // 0: Aries ── スセリビメ
+  {
+    sign:'牡羊座', en:'Aries', goddess:'スセリビメ', theme:'運命を選ぶ',
+    glyph:'♈', color:'スカーレット × ゴールド',
+    hook:'「衝動で失敗した」と後悔しているあなたへ。',
+    whisper:'その情熱こそが、凍りついた世界を動かす始動の火。',
+    tension:'考える前に動く', fear:'止められること＝否定', guard:'始まり・突破口',
+    kotodama:'今は動かなくても、私は消えない',
+    message:'あなたの衝動は破壊ではなく、創造の始まりです。恐れを手放し、自分の火を信じてください。',
+    cyclePos:2, phase:1,
+    shadow:'他者のせいにする、被害者意識、衝動への後悔',
+    awakening:'自分で選ぶ勇気を持ち、人生の主導権を握る',
+    nextIdx:9,
+    evolutionAdvice:'一つのことを選び抜く練習を。「私が選んだ」と言える決断を積み重ねることが、イワナガヒメ（永続）への扉を開きます。',
+    mythSource:'古事記',
+    myth:'スサノオの娘で、根の国でオオクニヌシと一目で恋に落ち、結婚を決めます。スサノオがオオクニヌシに課した数々の危険な試練を、スセリビメは知恵と行動で助け、夫を守ります。一方で、オオクニヌシの他の妻たちに対して激しく嫉妬し、ヤカミヒメを追い返してしまう面も持ちます。',
+    mythConnect:'「試練の中で主体的に動いて運命を切り開く妻」としての側面と、「嫉妬深さ」という影の側面を併せ持ちます。自分の感情・選択に責任を持つこと、他人のせいにせず自らの関わり方を選び直す女神として位置づけられます。',
+    personality:'行動が思考より早く、直感と情熱で物事を突破する先駆者。「これだ！」と感じたら迷わず飛び込む。エネルギッシュで場を動かす力があるが、熱が冷めると急速に興味を失うことも。嫉妬心が強く独占欲もある。被害者意識に陥ると、選択への責任を他者に転嫁しやすい面がある。',
+    love:'一目惚れしやすく、猛スピードで恋に飛び込む。追う恋が好きで、追われると逆に冷めやすい。嫉妬深く恋人を独占したいが、自分は自由でいたいという矛盾を抱える。熱量が高い分、熱が冷めると関係が急変することも。',
+    pitfall:'衝動的な言動で後悔し、「やっぱり違う」を繰り返す。始めたことを続けられず半端で終わる。物事がうまくいかないと「相手のせい」にして関係を壊す。',
+    strengths:'圧倒的な行動力・突破力・場の空気を変えるエネルギー・人が諦めるところで動き出す勇気・直感的なリーダーシップ',
+    compatible:'イワナガヒメ（山羊座）──土台があなたの衝動を方向付ける / アメノウズメ（双子座）──軽やかさが衝動を解放する',
+    avoid:'トヨタマヒメ（蟹座）──感情への依存がぶつかる / オオゲツヒメ（魚座）──方向性のなさが互いを消耗させる',
+    darkIdx:1,
+    darkSlip:'ウケモチの「欠乏の闇」へ退行する。衝動を恥じて動けなくなり、変化を頑なに拒み始める。情熱の人が、失う恐れから溜め込み・執着に変わる。',
+    darkAdvice:'「まず一歩だけ」でいい。完璧な準備を待つのは退行の罠。小さな行動が光へ戻す。',
+    enneagram:'タイプ8（挑戦者）',
+    darkState:'思考が止まり、孤独に引きこもる（→タイプ5）',
+    lightKey:'他者への献身と受容（→タイプ2）'
+  },
+  // 1: Taurus ── ウケモチ
+  {
+    sign:'牡牛座', en:'Taurus', goddess:'ウケモチ', theme:'豊かさ',
+    glyph:'♉', color:'モスグリーン × テラコッタ',
+    hook:'「欲張りで頑固」だと自分を責めたあなたへ。',
+    whisper:'五感のこだわりは、地上に豊穣をもたらす祈り。',
+    tension:'自分を後回しにする', fear:'失うこと・欠乏', guard:'安心・継続',
+    kotodama:'足りなくならないように、私も受け取っていい',
+    message:'与え続けるあなたの力は本物です。自分が満たされてこそ、本当の豊かさが生まれます。',
+    cyclePos:1, phase:1,
+    shadow:'物質的な不安、欠乏感、与えても報われない恐れ',
+    awakening:'循環を知り、与えることと受け取ることのバランスを取る',
+    nextIdx:0,
+    evolutionAdvice:'今日、自分に何か一つ「受け取る」許可を出してください。豊かさは循環です。スセリビメ（運命）へ進む鍵は、自分の選択を信じることです。',
+    mythSource:'古事記・日本書紀',
+    myth:'アマテラスの命でツクヨミが保食神ウケモチを訪ねると、ウケモチは口や身体から穀物や魚・獣などの食物を次々と生み出してもてなします。しかしツクヨミはその様子を「汚らわしい」と怒り、ウケモチを斬り殺します。その亡骸から五穀や家畜が生じ、人々の糧となるという「犠牲からの豊穣と循環」の神話が語られます。',
+    mythConnect:'「命を差し出すことで豊かさが循環する」「死から新たな実りが生まれる」モチーフは、物質的な不安や欠乏から、循環・信頼・受け取る力への目覚めと深く重なります。すべてを与え尽くした後にこそ、新たな豊かさが生まれるのです。',
+    personality:'五感を大切にし、美しいものや心地よいものを深く愛する存在。変化を嫌い、安定した環境で最大限に力を発揮する。一見頑固に見えるが、それは自分の価値観を大切にしているから。モノ・食・場所への愛着が深く、「豊かさ」とは感覚的充足を意味する。',
+    love:'安心感を基盤に、じっくり時間をかけて信頼を育む。一度惚れたら長く深く愛し、浮気や急な変化に敏感。愛着が執着に変わりやすく、手放すことへの恐れが関係を重くすることも。尽くすことで愛を確認する傾向がある。',
+    pitfall:'変化を恐れすぎて成長の機会を逃す。与え続けて燃え尽きるのに「もっと与えれば愛される」と繰り返す。欠乏感から物・人への依存が強まる。',
+    strengths:'揺るぎない継続力・深く静かな忍耐・五感を通した豊かさの表現・人を安心させる存在感・長期的な信頼の構築',
+    compatible:'スセリビメ（牡羊座）──動き出す力を補い合う / イザナミ（蠍座）──深い愛と変容を共に理解する',
+    avoid:'アメノサグメ（水瓶座）──変化への要求があなたの安定を脅かす / ククリヒメ（射手座）──自由への欲求が継続を壊す',
+    darkIdx:11,
+    darkSlip:'オオゲツヒメの「溶解の闇」へ退行する。現実から逃げ、夢想や依存に溺れ始める。境界線が消え、すべてを諦めて流されていく。安定の人が、境界なき漂流者になる。',
+    darkAdvice:'今日、何か一つ地に足をつける行動を。現実の感触に戻ることが光への道。',
+    enneagram:'タイプ4（個性的な人）',
+    darkState:'依存心が強まり、他者にすがりつく（→タイプ2）',
+    lightKey:'規律を持って日常を整える（→タイプ1）'
+  },
+  // 2: Gemini ── アメノウズメ
+  {
+    sign:'双子座', en:'Gemini', goddess:'アメノウズメ', theme:'表現',
+    glyph:'♊', color:'シトラスイエロー × スカイブルー',
+    hook:'器用貧乏で、本音が見えないと言われたあなたへ。',
+    whisper:'軽やかな言葉は、閉ざされた扉を開く魔法の鍵。',
+    tension:'笑いや言葉で流す', fear:'重くなること', guard:'流れ・つながり',
+    kotodama:'今は、無理に明るくしなくていい',
+    message:'あなたの「場を開く力」は本物の才能です。重さを感じる時こそ、立ち止まる勇気を。',
+    cyclePos:8, phase:3,
+    shadow:'注目を求める、表面的なつながり、本音が見えない',
+    awakening:'注目を求めるのではなく、存在そのもので場を明るくする',
+    nextIdx:10,
+    evolutionAdvice:'笑いや言葉の裏にある本音を、一人の信頼できる人に少しだけ見せてみてください。それがアメノサグメ（洞察）の直感へ続く道です。',
+    mythSource:'古事記・日本書紀',
+    myth:'アマテラスが天岩戸に隠れて世界が闇に包まれたとき、天岩戸の前でアメノウズメが半裸になって激しく踊り、八百万の神々を大笑いさせます。その騒ぎに興味を持ったアマテラスが戸を開いたことで、光が世界に戻りました。',
+    mythConnect:'自分の身体と表現を使って場の空気を変え、光を取り戻した女神です。「注目されたいから」ではなく、「場を明るくするために自分の本領を解放する」存在として、自己表現の象徴に非常に相性が良いです。',
+    personality:'好奇心旺盛で話上手。様々なことに興味を持ち、場を和ませる天才。頭の回転が早く、多角的な視点で物事を見る。でも深く一つにコミットするのが苦手で、表面的なつながりに終わりがち。本音を見せるのが怖く、軽さで自分を守る傾向がある。',
+    love:'会話が盛り上がる相手に惹かれ、知的な刺激を重視する。感情的な重さが苦手で、深刻になると距離を置きたくなる。好奇心から複数の関係が重なることも。本当の意味で心を開ける相手を探し続ける。',
+    pitfall:'本音を隠しすぎて「あなたが何を考えているかわからない」と言われる。表面的な関係に埋もれて深い孤独を感じる。興味が分散して何一つ深められない。',
+    strengths:'コミュニケーションの才・場を明るくする力・高い適応力・多方面のアイデア・人と人をつなぐ橋渡し力',
+    compatible:'イチキシマヒメ（獅子座）──表現の喜びを分かち合う / アメノサグメ（水瓶座）──知的探求が深く共鳴する',
+    avoid:'イワナガヒメ（山羊座）──重さと継続への要求があなたを窒息させる / トヨウケヒメ（乙女座）──完璧さへの要求が逃げ場をなくす',
+    darkIdx:4,
+    darkSlip:'イチキシマヒメの「称賛渇望の闇」へ退行する。注目を独占しようと振る舞いが大げさになる。傷つきやすいプライドが反応的になり、「つなぐ喜び」が「認めさせたい」に変わる。',
+    darkAdvice:'場を明るくする本来の動機に立ち返ること。誰かに感謝を伝える行動が光を取り戻す。',
+    enneagram:'タイプ7（熱中する人）',
+    darkState:'批判的になり、完璧主義で自分を縛る（→タイプ1）',
+    lightKey:'静寂の中で真理を観察する（→タイプ5）'
+  },
+  // 3: Cancer ── トヨタマヒメ
+  {
+    sign:'蟹座', en:'Cancer', goddess:'トヨタマヒメ', theme:'母性',
+    glyph:'♋', color:'パールホワイト × 深紅',
+    hook:'「尽くして報われなかった」と絶望した母性へ。',
+    whisper:'その傷跡は、命を育もうとした愛の深さゆえ。',
+    tension:'守りすぎる', fear:'見捨てられること', guard:'居場所・関係',
+    kotodama:'守らなくても、離れない関係がある',
+    message:'あなたの深い愛情は世界の宝です。自分を守ることもまた、愛の表現と知ってください。',
+    cyclePos:4, phase:2,
+    shadow:'依存・過干渉、守りすぎる、見捨てられへの恐怖',
+    awakening:'依存を卒業し、深い共感で相手の自立を支える',
+    nextIdx:5,
+    evolutionAdvice:'「手放すことも愛」と知ること。相手の自立を応援できた時、トヨウケヒメ（奉仕）の深い喜びへと進化します。',
+    mythSource:'古事記',
+    myth:'海神ワタツミの娘で、山幸彦（ホオリ）と恋に落ち、龍宮で三年共に過ごします。地上で子を産む際、トヨタマヒメは本来の姿である大きな和邇（サメ・海の存在）に戻って出産しようとしますが、その姿を見ないでほしいと願ったにもかかわらず、山幸彦は覗き見てしまい、彼女は深く傷ついて海へ帰ってしまいます。',
+    mythConnect:'本質を見せる怖さ、ありのままの自分を受け入れてほしい願い、信頼が裏切られた痛みと距離の取り方など、「母性」や深い共感・境界線のテーマを体現する女神です。',
+    personality:'深い共感力と包容力を持ち、家族や親しい人への愛情は誰よりも深い。感情と環境を切り離すのが難しく、傷つくことへの恐れが行動を制限する。「居場所」「関係」「つながり」への執着が強く、安全な巣を作ることが人生の核になる。',
+    love:'一度愛したら全力で守り、尽くす。でも「見捨てられる恐怖」から過干渉になったり、自分を犠牲にしすぎる。相手の感情に敏感すぎて振り回されやすく、夢と現実のギャップで傷つくことも。',
+    pitfall:'依存と過干渉。感情に支配され判断が歪む。家・人・過去を手放せない。守りすぎて相手の成長を妨げる。',
+    strengths:'深い共感力・直感・気づかいの細やかさ・安心できる場を作る力・深い愛情・感情の豊かさ',
+    compatible:'トヨウケヒメ（乙女座）──安心と奉仕が静かに重なる / オオゲツヒメ（魚座）──共感の深さが溶け合う',
+    avoid:'スセリビメ（牡羊座）──衝動的な動きが情緒を乱す / アメノサグメ（水瓶座）──感情より論理を優先され傷つく',
+    darkIdx:9,
+    darkSlip:'イワナガヒメの「凍結の闇」へ退行する。傷を守るために感情を閉じ込め、冷たく支配的になる。愛情が管理とコントロールに変わり、心に壁を作る。',
+    darkAdvice:'たった一人に「本当は怖い」と伝えること。弱さを見せることが凍結を溶かす。',
+    enneagram:'タイプ9（平和主義）',
+    darkState:'不安に支配され、過剰に疑い深くなる（→タイプ6）',
+    lightKey:'自分の意思を明確に伝える（→タイプ3）'
+  },
+  // 4: Leo ── イチキシマヒメ
+  {
+    sign:'獅子座', en:'Leo', goddess:'イチキシマヒメ', theme:'魅力',
+    glyph:'♌', color:'サンフラワーゴールド × オレンジ',
+    hook:'自信がないのに、強がって生きてきたあなたへ。',
+    whisper:'あなたが輝くことは、世界を照らす光の責任。',
+    tension:'強く振る舞う', fear:'価値がないと思われる', guard:'尊厳・誇り',
+    kotodama:'隠れても、私の光は消えない',
+    message:'あなたの魅力は努力の産物ではなく、存在そのものに宿っています。輝くことを許可して。',
+    cyclePos:7, phase:3,
+    shadow:'比較と嫉妬、価値がないと思われる恐れ、強がり',
+    awakening:'比較をやめ、自分だけの輝きで人を照らす',
+    nextIdx:2,
+    evolutionAdvice:'「誰かより」ではなく「昨日の自分より」の視点へ。あなたの光が比較を手放した時、アメノウズメ（表現）の自由な場が開かれます。',
+    mythSource:'古事記・日本書紀 / 宗像大社・厳島神社',
+    myth:'宗像三女神の一柱で、水辺と芸能・弁舌を司る神です。後に仏教の弁才天と習合し、音楽や芸術の女神としての性格が強まり、「容姿端麗な神」「女性守護の神」として厳島神社など各地で広く信仰されています。',
+    mythConnect:'水・芸能・言葉・美しさを司る女神で、「芸と美を通して輝く存在」というテーマを体現します。他者との比較ではなく、固有の魅力を磨くことで存在そのものが光になる——その道を示す女神です。',
+    personality:'自然に周囲の目を引き、場を支配する存在感を持つ。美しさや表現に強いこだわりがある。自尊心が高いが、実は他者の評価をとても気にしている。称賛を必要とし、無視されることが最大の痛みになる。愛と創造のために生きる、太陽のような存在。',
+    love:'ロマンチックで情熱的。相手を特別扱いしてもらいたいし、自分も相手を特別扱いしたい。批判に敏感で、プライドが傷つくと攻撃的になることも。見守られ尊重される関係に深い安らぎを感じる。',
+    pitfall:'称賛がないと自己否定に陥る。比較と嫉妬が心を蝕む。強がりで本音を隠す。プライドが邪魔して謝れず関係を壊す。',
+    strengths:'カリスマ性・表現力・創造力・人を引きつける情熱・舞台を作る力・誰もが輝ける空間を生み出す力',
+    compatible:'アメノウズメ（双子座）──表現と遊びが弾み合う / ククリヒメ（射手座）──互いの光を讃え合える',
+    avoid:'トヨウケヒメ（乙女座）──批判の目があなたの輝きを萎縮させる / イワナガヒメ（山羊座）──重さが自由な光を封じる',
+    darkIdx:8,
+    darkSlip:'ククリヒメの「逃走の闇」へ退行する。承認されないと感じた瞬間に逃走・説教・自己正当化が始まる。傷つく可能性から逃げ回り、理想を語るだけで行動しなくなる。',
+    darkAdvice:'その場に留まる勇気を。逃げずに感情を感じ切ることが光への入口。',
+    enneagram:'タイプ3（達成者）',
+    darkState:'無気力になり、思考が停止する（→タイプ9）',
+    lightKey:'仲間を信頼し、絆を育む（→タイプ6）'
+  },
+  // 5: Virgo ── トヨウケヒメ
+  {
+    sign:'乙女座', en:'Virgo', goddess:'トヨウケヒメ', theme:'奉仕',
+    glyph:'♍', color:'桜色 × クリアホワイト',
+    hook:'完璧を求めて、人を遠ざけてしまったあなたへ。',
+    whisper:'その潔癖さは、不純を許さない魂の高潔な美学。',
+    tension:'完璧を目指す', fear:'間違えること', guard:'秩序・安心',
+    kotodama:'未完成のままでも、ここにいていい',
+    message:'あなたの丁寧さは世界を美しくします。「十分」という言葉をもう一度、自分に贈ってください。',
+    cyclePos:5, phase:2,
+    shadow:'自己犠牲、完璧主義、奉仕が義務になる',
+    awakening:'自己犠牲ではなく、溢れたエネルギーで社会を支える',
+    nextIdx:8,
+    evolutionAdvice:'自分を満たしてから与える。今日の自分に「十分」という言葉を贈れた時、ククリヒメ（仲裁）のしなやかさへと進化します。',
+    mythSource:'伊勢神宮 外宮（豊受大神宮）主祭神',
+    myth:'伊勢神宮外宮の主祭神・豊受大神（トヨウケ）は、天照大神の食物を司る神であり、「ウケ＝食物」を意味します。食物・穀物・衣食住を支える存在として、天照の「御饌（みけ）」を整える役割を担い、豊穣と日々の糧をもたらす神として今も日々の祭祀で敬われます。',
+    mythConnect:'「食物を整え、日々の糧を提供する」役割は他者を支える奉仕そのものです。しかし女神自身が枯れるのではなく、豊かさを生み出し続ける源として描かれているため、「自己犠牲ではない自然な奉仕」の象徴として位置づけられます。',
+    personality:'細部まで気を配り、完璧を求める几帳面な性格。批判的思考が強く、何事も分析・整理したがる。他者のために尽くすことに喜びを感じるが、自己犠牲になりやすい。「役に立てている」ことで自己価値を確認する傾向がある。',
+    love:'相手を慎重に観察し、信頼できると確信してから心を開く。尽くし型だが、見返りを期待して失望することも。細かすぎる指摘が摩擦になることがある。完璧な関係を求めすぎて現実とのギャップに苦しむ。',
+    pitfall:'完璧主義で自分も他人も追い詰める。奉仕が義務化して燃え尽きる。批判的すぎて関係を壊す。自己評価が低く、どれだけ努力しても満足できない。',
+    strengths:'観察力・分析力・細やかな丁寧さ・高い信頼性・実務能力・健康や習慣への深い気づき',
+    compatible:'トヨタマヒメ（蟹座）──奉仕と愛が静かに重なる / イワナガヒメ（山羊座）──共に着実に積み上げる',
+    avoid:'イチキシマヒメ（獅子座）──批判の目が大きな表現を萎縮させる / スセリビメ（牡羊座）──衝動的な行動があなたの秩序を乱す',
+    darkIdx:3,
+    darkSlip:'トヨタマヒメの「情緒依存の闇」へ退行する。世話をすることで相手を縛り始める。奉仕が義務になると、過度な心配と感情的な必要性で関係をコントロールしようとする。',
+    darkAdvice:'今日、誰かに頼ること。受け取る許可が情緒的な依存から自由にする。',
+    enneagram:'タイプ2（助ける人）',
+    darkState:'支配欲が強まり、攻撃的になる（→タイプ8）',
+    lightKey:'自分の「本当の望み」を知る（→タイプ4）'
+  },
+  // 6: Libra ── セオリツヒメ
+  {
+    sign:'天秤座', en:'Libra', goddess:'セオリツヒメ', theme:'調和',
+    glyph:'♎', color:'水色（清流）× シルバー',
+    hook:'顔色を伺って自分を消してきたあなたへ。',
+    whisper:'あなたは、場の淀みを流す「清らかな流れ」だった。',
+    tension:'自分を消す', fear:'対立', guard:'調和',
+    kotodama:'偏っても、関係は壊れない',
+    message:'あなたがいるだけで場が清まる。それはあなたの選択ではなく、天性の力です。',
+    cyclePos:10, phase:4,
+    shadow:'無理な調整、自分を消す、流れへの抵抗',
+    awakening:'無理な調整を捨て、大いなる流れの中にバランスを見出す',
+    nextIdx:7,
+    evolutionAdvice:'自然な流れに身を委ねてください。完璧な調和ではなく、動的なバランスを受け入れた時、イザナミ（変容）の深い力が目覚めます。',
+    mythSource:'大祓詞（おおはらえのことば）/ 祓戸四神',
+    myth:'瀬織津姫は「大祓詞」に登場する祓戸大神の筆頭で、罪や穢れを川に流し、海に運び去る水の女神として語られます。記紀にははっきり出ず、後世の神道信仰・伝承の中で強い存在感を持ちますが、「祓い・浄化・流れに委ねる」性格が特徴です。',
+    mythConnect:'無理に自分でコントロールする「調整」ではなく、大きな流れの中で不要なものを流し、自然なバランスを取り戻す役割を持ちます。あなたが持つ「場を清める力」は意志ではなく、存在そのものから湧き出るものです。',
+    personality:'公平さと美しさを愛し、争いを好まない。人の気持ちを読む力が高く、場を調和させる天才。でも自分の意見を持ちながらもそれを表現するのが怖く、結果的に曖昧な返答で場を乗り越えようとする。本当は深い感受性と美意識を持っている。',
+    love:'相手に合わせすぎて自分を見失う。関係を壊したくないあまり言いたいことが言えない。美しく洗練された恋愛を求め、表面的な完璧さにこだわる。本当の意味で対等な関係を渇望している。',
+    pitfall:'自分を消して八方美人になる。決断できず先送りする。「好かれること」への依存。対立を恐れて問題を積み重ね、やがて爆発する。',
+    strengths:'調和力・美的センス・交渉力・共感力・公平な判断力・場を清めるような自然な存在感',
+    compatible:'イワナガヒメ（山羊座）──土台があなたの不安定さを支える / アメノウズメ（双子座）──軽やかさが自分らしさを引き出す',
+    avoid:'スセリビメ（牡羊座）──衝動的な動きが心の平和を壊す / イザナミ（蠍座）──激しさに飲み込まれてしまう',
+    darkIdx:10,
+    darkSlip:'アメノサグメの「孤立の闇」へ退行する。急に感情を切り離し、冷淡で反抗的になる。「もう誰にも合わせない」と孤立を選び、つながりを切って孤高を装う。',
+    darkAdvice:'離れたくなった時こそ、一言だけ正直に伝えること。その一言が流れに戻す。',
+    enneagram:'タイプ9（平和主義）',
+    darkState:'不安に支配され、過剰に疑い深くなる（→タイプ6）',
+    lightKey:'自ら目標を掲げて行動する（→タイプ3）'
+  },
+  // 7: Scorpio ── イザナミ
+  {
+    sign:'蠍座', en:'Scorpio', goddess:'イザナミ', theme:'変容',
+    glyph:'♏', color:'ディープパープル × スレートグレー',
+    hook:'愛が重すぎて、自分を嫌いになったあなたへ。',
+    whisper:'その執着は、永遠の真実を守り抜こうとした誠実さ。',
+    tension:'極端になる', fear:'裏切り', guard:'真実・覚悟',
+    kotodama:'今は、すべてを賭けなくていい',
+    message:'あなたは死と再生を知る者。その深さは弱さではなく、誰も辿り着けない魂の強さです。',
+    cyclePos:11, phase:4,
+    shadow:'過去への執着、離せない愛、極端な感情',
+    awakening:'過去への執着を手放し、古い自分を終わらせる',
+    nextIdx:11,
+    evolutionAdvice:'「終わらせること」が新たな始まりです。何か一つ、意識的に手放す儀式をしてみてください。それがオオゲツヒメ（再生）の門を開きます。',
+    mythSource:'古事記・日本書紀',
+    myth:'国生み・神生みの女神としてイザナギと共に日本の島々や神々を生みますが、火の神カグツチを産んだことで死に、黄泉の国へ行きます。イザナギが黄泉の国へ迎えに行きますが、変わり果てた姿を見てしまい、追われながら逃げ帰ります。やがて二柱は黄泉比良坂で決別し、イザナミは「一日に千人を殺す」と宣言し、イザナギは「一日に千五百の産屋を建てる」と応じます。',
+    mythConnect:'「生と死」「創造と破壊」「離別と境界」の女神であり、古い自分・過去への執着を終わらせる変容の象徴です。愛したがゆえに放せない深さは、この女神の本質そのものです。',
+    personality:'深く、強く、すべてかゼロかの思考をする。表面には見せないが、内側には強烈な感情の渦がある。直感が鋭く、人の本質を見抜く力がある。一度信頼した相手には全力を尽くすが、裏切りは決して許せない。生と死、闇と光を等価で理解できる稀有な存在。',
+    love:'全力で愛し、全力で嫉妬する。浅い関係には興味がなく、魂ごとぶつかり合える深い関係を求める。一度愛したら手放せず、執着が強くなる。愛と憎しみは表裏一体だと知っている。',
+    pitfall:'過去への執着と怒り。極端な感情で関係を壊す。コントロール欲求。変わることへの強い抵抗。復讐心が長引く。',
+    strengths:'鋭い直感・洞察力・変革力・深い愛情・秘密を守る誠実さ・危機的状況での冷静な判断力',
+    compatible:'ウケモチ（牡牛座）──深い愛と豊かさが共鳴する / オオゲツヒメ（魚座）──変容と再生を共に理解する',
+    avoid:'セオリツヒメ（天秤座）──深さに恐れをなして表面を繕う / アメノウズメ（双子座）──軽さが深さを傷つける',
+    darkIdx:6,
+    darkSlip:'セオリツヒメの「調整の闇」へ退行する。深さを失い、表面的な調和で場を取り繕う。傷を隠すために八方美人になり、本来の変容の力を「丸め込む」ことで蓋をする。',
+    darkAdvice:'「本当に感じていること」を一つだけ表現すること。深さへの回帰が変容の鍵。',
+    enneagram:'タイプ6（忠実家）',
+    darkState:'虚栄心で自分を飾り、多忙に逃げる（→タイプ3）',
+    lightKey:'すべてを委ねる心の平和（→タイプ9）'
+  },
+  // 8: Sagittarius ── ククリヒメ
+  {
+    sign:'射手座', en:'Sagittarius', goddess:'ククリヒメ', theme:'仲裁',
+    glyph:'♐', color:'ラベンダー × ターコイズブルー',
+    hook:'「何者にもなれなかった」と嘆く旅人へ。',
+    whisper:'迷走に見えた日々は、天と地を結ぶ儀式だった。',
+    tension:'遠くを見る', fear:'無意味', guard:'真理・希望',
+    kotodama:'答えは、今ここになくてもいい',
+    message:'あなたの広がりは迷いではありません。異なるものを繋ぐ力は、あなたにしかない使命です。',
+    cyclePos:6, phase:2,
+    shadow:'板挟み、自分を消して合わせる、孤独な仲裁',
+    awakening:'個と個を結びつけながら、自分自身も輝く存在でいる',
+    nextIdx:4,
+    evolutionAdvice:'自分の意見を持ちながら仲介する。「あなたはどう思う？」に自分の言葉で答えられた時、イチキシマヒメ（魅力）の個の輝きへ進化します。',
+    mythSource:'日本書紀（一書）/ 白山比咩神社',
+    myth:'ククリヒメ（菊理媛神）は日本書紀の一書に登場する女神で、イザナギとイザナミが黄泉で別れを迎える場面で、二柱の間に入って何かを言葉にし、その場を収めたとされます。このことから男女の縁結び、商談の成立、さらに死者イザナミと生者イザナギをつなぐ「シャーマン的存在」としても語られます。',
+    mythConnect:'対立する二者をただ中和するのではなく、「それぞれを尊重した上で結ぶ」仲裁者という位置づけが可能です。自分を消して合わせる同調ではなく、個と個を結びつける力を持つ女神です。',
+    personality:'自由と探求を愛し、枠組みを嫌う。異なる世界や考えに触れることで活力を得る。人と人の橋渡しをする自然な才能がある。でも自分の居場所が定まらず、逃げるように旅や学びを続けることも。「意味」「真理」「つながり」を求め続ける旅人。',
+    love:'縛られることを嫌い、自由な関係を求める。でも本当に心を開いた相手には深い信頼を見せる。束縛や嫉妬が苦手。精神的な共鳴・哲学的な会話・共に成長できる関係を大切にする。',
+    pitfall:'深いコミットを避けて逃げる。板挟みで自分を消す。浅く広くで本質的なつながりがない。「もっと先に本当の居場所がある」と現在を軽視する。',
+    strengths:'広い包容力・異文化適応力・橋渡しの力・ユーモア・直感的な真理の把握・未知の世界を開拓する行動力',
+    compatible:'イチキシマヒメ（獅子座）──互いの光を讃え合う / アメノウズメ（双子座）──自由と好奇心が共鳴する',
+    avoid:'トヨタマヒメ（蟹座）──感情的な束縛が息苦しい / トヨウケヒメ（乙女座）──完璧さへの要求が自由を奪う',
+    darkIdx:5,
+    darkSlip:'トヨウケヒメの「批判の闇」へ退行する。自由な探求者が突然、細部を批判し自己批判が始まる。「こんなはずじゃなかった」と完璧を求め、不安から動けなくなる。',
+    darkAdvice:'大きな視点に戻ること。「今日一つだけ意味のある行動」が批判の螺旋を止める。',
+    enneagram:'タイプ2（助ける人）',
+    darkState:'支配欲が強まり、攻撃的になる（→タイプ8）',
+    lightKey:'内面の深淵と個性を愛する（→タイプ4）'
+  },
+  // 9: Capricorn ── イワナガヒメ
+  {
+    sign:'山羊座', en:'Capricorn', goddess:'イワナガヒメ', theme:'永続',
+    glyph:'♑', color:'ロイヤルブルー × ブラウン',
+    hook:'結果のために自分を削り続けたあなたへ。',
+    whisper:'その重荷は、愛する世界を支えた聖なる責任感。',
+    tension:'責任を引き受ける', fear:'崩壊', guard:'基盤・信頼',
+    kotodama:'降ろしても、世界は回る',
+    message:'岩のように揺るがないあなたの存在が、周りの人を支えています。休むことも使命の一部です。',
+    cyclePos:3, phase:1,
+    shadow:'変化への恐れ、結果のために自分を削る、崩壊への不安',
+    awakening:'目先の変化に惑わされず、自分という揺るぎない土台を固める',
+    nextIdx:3,
+    evolutionAdvice:'休むことも使命と知ってください。「自分」という土台が固まった時、トヨタマヒメ（母性）の深い共感でフェーズ2へ踏み出せます。',
+    mythSource:'古事記・日本書紀',
+    myth:'オオヤマツミの娘で、妹コノハナサクヤビメと共にニニギに嫁ぐはずでしたが、醜い容姿を理由にニニギから拒まれ、妹だけが妻として迎えられます。イワナガヒメは恥と怒りから、「私も娶っていたなら、あなたの子孫は岩のように永遠だったでしょう。だが花のような妹だけを選んだので、子孫は花のように儚い命となる」と呪います。この神話が「神や天皇にも寿命が生じた理由」とされます。',
+    mythConnect:'岩＝「変わらない・永続・土台」の象徴であり、目先の美しさ（花）だけを選ぶと持続性を失うという教訓が込められています。短期的な魅力ではなく、長期的な土台を選び取る力——自己の基盤を固めるテーマと深く合致します。',
+    personality:'責任感が強く、実直で信頼できる。目標に向かって着実に進む計画力がある。感情より理性を優先し、長期的な視点で物事を見る。自分に厳しく、他者にも高い基準を求めがち。「岩」のような揺るぎない存在感が、周囲に安心をもたらす。',
+    love:'慎重に相手を見極め、信頼できると確信してから関係を深める。一度決めたら長く誠実に続ける。でも感情表現が苦手で冷たく見られることがある。仕事や目標を優先しすぎて恋愛が後回しになることも。',
+    pitfall:'変化への恐れと固執。完璧主義で自分を追い込む。柔軟性の欠如。感情を閉じ込めて孤立する。失敗を極度に恐れる。',
+    strengths:'揺るぎない継続力・責任感・実行力・高い信頼性・長期戦略・人が信頼できる基盤を作る力',
+    compatible:'セオリツヒメ（天秤座）──美と調和があなたの重さを和らげる / トヨウケヒメ（乙女座）──共に着実に積み上げる',
+    avoid:'イチキシマヒメ（獅子座）──派手さとプライドが土台を乱す / スセリビメ（牡羊座）──衝動的な動きが計画を壊す',
+    darkIdx:0,
+    darkSlip:'スセリビメの「衝動の闇」へ退行する。長年の抑制が限界を超え、突発的に爆発する。「もう知らない」と無謀な行動に出る。冷静な土台の人が、衝動的で攻撃的になる。',
+    darkAdvice:'「少し休む」ことを許可すること。立ち止まる勇気が衝動の爆発を防ぐ。',
+    enneagram:'タイプ1（改革者）',
+    darkState:'感情が爆発し、悲劇のヒロイン化（→タイプ4）',
+    lightKey:'遊び心と自由な発想（→タイプ7）'
+  },
+  // 10: Aquarius ── アメノサグメ
+  {
+    sign:'水瓶座', en:'Aquarius', goddess:'アメノサグメ', theme:'洞察',
+    glyph:'♒', color:'エレクトリックブルー × シルバー',
+    hook:'「普通」になれなくて孤独だったあなたへ。',
+    whisper:'異質なのは、あなたが未来の真実を視ているから。',
+    tension:'逆を言う', fear:'同化', guard:'自由・未来',
+    kotodama:'今は、違わなくてもいい',
+    message:'あなたが見ている景色は、まだ誰も見ていない未来です。孤独は先駆者の証。',
+    cyclePos:9, phase:3,
+    shadow:'孤立・孤独、疑いと反発、同化への恐れ',
+    awakening:'疑いを捨て、直感で物事の本質（真実）を掴む',
+    nextIdx:6,
+    evolutionAdvice:'「違う」ことを武器にする。直感を信じて一つ行動に移してみてください。それがセオリツヒメ（調和）の大きな流れへ続く道です。',
+    mythSource:'古事記・日本書紀 ／「あまのじゃく」語源説',
+    myth:'天探女（アメノサグメ）は、天照の命を受けて派遣された雉を、天稚彦に射殺させてしまった邪心の女神とされ、「あまのじゃく」の語源ともいわれます。常に流れに逆らい、反骨の精神を宿した存在として描かれています。',
+    mythConnect:'伝統的には「邪心・反抗」の象徴ですが、「疑い・皮肉・ネガティブな洞察」を、より成熟した「直感的な真実の見抜き方」へと変容させる女神として再解釈できます。影の側面をどう統合するかが、この女神の本質に迫る鍵です。',
+    personality:'独自の視点を持ち、常識や権威に疑問を投げかける。人道的な理想を持ち、社会の枠から外れることを恐れない。感情よりも知性・論理を優先し、感情移入が苦手に見られることがある。「正しいと思うこと」への信念が強く、妥協を嫌う。',
+    love:'友情から始まる関係を好み、精神的なつながりを重視する。束縛が苦手で、相手の独立性も尊重する。感情的な重さには距離を置きたくなる。同じ理想やビジョンを共有できる相手との絆が深まる。',
+    pitfall:'孤立しすぎる。感情を切り捨てて冷たくなる。変わっていることへの頑固なこだわり。人を遠ざける批評的な態度。固定した信念が視野を狭める。',
+    strengths:'先見性・独創性・論理力・社会への貢献意識・反骨精神・時代を先読みする直感・枠を超えた発想',
+    compatible:'アメノウズメ（双子座）──知的な会話と自由さが共鳴する / ククリヒメ（射手座）──哲学と理想が響き合う',
+    avoid:'トヨタマヒメ（蟹座）──感情への要求があなたを圧迫する / ウケモチ（牡牛座）──変化への拒否反応がぶつかる',
+    darkIdx:2,
+    darkSlip:'アメノウズメの「散漫の闇」へ退行する。先見的なビジョンが消え、注目目的のパフォーマンスに変わる。表面的で軽い言動が増え、本質的な信念を失ってただ「面白い人」になる。',
+    darkAdvice:'一人の時間を作り、本当に信じていることに触れること。孤独の中に力がある。',
+    enneagram:'タイプ5（観察者）',
+    darkState:'散漫になり、刺激を求めて逃避する（→タイプ7）',
+    lightKey:'勇気を持って現実を動かす（→タイプ8）'
+  },
+  // 11: Pisces ── オオゲツヒメ
+  {
+    sign:'魚座', en:'Pisces', goddess:'オオゲツヒメ', theme:'再生',
+    glyph:'♓', color:'アクアマリン × 乳白色',
+    hook:'「優しすぎて損をした」と泣いた夜へ。',
+    whisper:'その涙は、あなたが世界の痛みを浄化した証。',
+    tension:'境界が消える', fear:'孤独', guard:'共感・祈り',
+    kotodama:'私は、ここまででいい',
+    message:'あなたは何度でも再生する力を持っています。溶けてしまいそうな時、境界線はあなたを守る愛です。',
+    cyclePos:12, phase:4,
+    shadow:'溶け込み境界がなくなる、すべてを引き受ける、孤独への恐れ',
+    awakening:'すべてを糧にして、何度でも新しい命（希望）を生み出す',
+    nextIdx:1,
+    evolutionAdvice:'「私はここまで」の境界線を一つ引いてみてください。再生した魂は、より深い豊かさを知るウケモチへ——新たな螺旋の始まりです。',
+    mythSource:'古事記',
+    myth:'穀物と養蚕の起源女神として、スサノオ（記によっては他の神）が訪ねた際、口や身体から食物を出してもてなしますが、汚らわしいと怒った神に殺されます。その亡骸から穀物や蚕が生まれ、人々の糧となったとされます。',
+    mythConnect:'ウケモチと非常に似た「犠牲から実りが生まれる」モチーフの女神で、「死からの再生」「全ての経験を養分に変える」象徴として位置づけられます。再生した魂が再びウケモチの新しい豊かさへ巡る——という循環構造にも美しく繋がります。',
+    personality:'高い感受性と共感力を持ち、芸術・音楽・夢・霊的なものに強く惹かれる。他者の感情を自分のように感じ取り、痛みも喜びも一緒に感じる。境界線が薄く、他者のエネルギーに影響されやすい。すべてを生み出す母なる海のような、再生と包容の存在。',
+    love:'恋愛に理想を求め、深い精神的つながりを大切にする。相手のために自分を捧げやすく、傷つきやすい。幻想と現実の間で揺れることが多い。「魂の出会い」を感じた相手には深い忠誠心を持つ。',
+    pitfall:'境界線のなさで自分を失う。夢想や依存による現実逃避。誰の感情も引き受けすぎて疲弊する。現実との乖離が深まる。',
+    strengths:'深い共感力・芸術的感性・直感・癒しの力・何度でも再生する力・すべてを受け容れる大きな器',
+    compatible:'イザナミ（蠍座）──変容と再生を共に深く理解する / トヨタマヒメ（蟹座）──共感の深さが溶け合う',
+    avoid:'アメノサグメ（水瓶座）──感情より論理を優先され傷つく / イワナガヒメ（山羊座）──重さと現実への要求が夢を壊す',
+    darkIdx:7,
+    darkSlip:'イザナミの「執着の闇」へ退行する。傷つき続けた優しさが、突然の激しい怒りと執着に変わる。「癒してあげた私がなぜ」という怒りが爆発し、破壊的になる。',
+    darkAdvice:'怒りを感じて良い。ただ、一人で感じること。その感情を言葉にすると光が戻る。',
+    enneagram:'タイプ4（個性的な人）',
+    darkState:'依存心が強まり、他者にすがりつく（→タイプ2）',
+    lightKey:'感情を建設的な行動に変える（→タイプ1）'
+  },
+];
+
+/* ══════════════════════════════════════
+   QUESTIONS（12問）
+══════════════════════════════════════ */
+/* ── 女神ごとの設問（影のテーマ × エニアグラム） ── */
+const ALL_QUESTIONS = [
+  // 0 スセリビメ（牡羊座・タイプ8 挑戦者）── 弱さへの恐れ・孤立・支配
+  [
+    {text:'弱みを見せると、相手につけ込まれそうで怖い'},
+    {text:'自分がコントロールできない状況に、強いストレスを感じる'},
+    {text:'誰かに頼るのは、負けを認めるような気がする'},
+    {text:'怒りが出ると、後から「言い過ぎた」と思うことがある'},
+    {text:'誰かが自分を支配しようとすると、強く反発したくなる'},
+    {text:'本当は傷ついているのに、強がってしまうことが多い'},
+    {text:'感謝を言葉で伝えるのが、照れくさくてできないことがある'},
+    {text:'信頼できる相手でも、完全に心を開くのに時間がかかる'},
+    {text:'「自分さえ強ければ、誰にも頼らなくていい」と感じることがある'},
+    {text:'一人でいると楽だが、同時に孤独を感じることもある'},
+    {text:'人を助けるより、自分で全部やってしまう方が早いと思う'},
+    {text:'感情より行動で示す方が、自分らしいと思う'},
+  ],
+  // 1 ウケモチ（牡牛座・タイプ4 個性的な人）── 羨望・孤独感・理想と現実
+  [
+    {text:'「自分だけが特別に孤独だ」と感じることがある'},
+    {text:'他の人が持っているものを、うらやましく思うことがある'},
+    {text:'「本当の自分をわかってくれる人がいない」と思うことがある'},
+    {text:'感情が波のように激しくなって、自分でも驚くことがある'},
+    {text:'過去の美しい記憶や失ったものに、引きずられやすい'},
+    {text:'「もし〇〇だったら」という想像の中に逃げてしまうことがある'},
+    {text:'自分の感情が強すぎて、相手を傷つけてしまうことが怖い'},
+    {text:'特別な存在でいたいという気持ちが、人並みでいることへの抵抗になる'},
+    {text:'関係が深まるほど、相手が離れていく不安が強くなる'},
+    {text:'満たされない気持ちが慢性的にあり、何が足りないかわからない'},
+    {text:'自分の感情を言葉にするのが難しく、誤解されることが多い'},
+    {text:'日常の「普通」に、どこか息苦しさを感じる'},
+  ],
+  // 2 アメノウズメ（双子座・タイプ7 熱中する人）── 痛みの回避・散漫・コミット恐怖
+  [
+    {text:'退屈や停滞感を感じると、すぐ新しいことを探したくなる'},
+    {text:'深刻な話や感情的なテーマを、冗談や話題転換でかわしてしまうことがある'},
+    {text:'一つのことに長く集中していると、焦りや閉塞感を感じる'},
+    {text:'楽しいことが終わった後、急に虚しくなることがある'},
+    {text:'「今を楽しめばいい」と思って、先のことを考えるのを避けることがある'},
+    {text:'人との約束や関係に、縛られている感覚を覚えることがある'},
+    {text:'感情を深く掘り下げるより、新しい刺激で気分を変える方が楽だ'},
+    {text:'「もっと面白いことがあるはず」という気持ちが、今に集中させてくれない'},
+    {text:'ネガティブな感情や出来事を、なるべく早く忘れようとする'},
+    {text:'複数のことを同時に進めていないと、不安になる'},
+    {text:'深く傷ついた経験を、笑い話に変えてしまうことがある'},
+    {text:'「あのとき真剣に向き合えばよかった」と後悔することがある'},
+  ],
+  // 3 トヨタマヒメ（蟹座・タイプ9 平和主義者）── 自己消去・怠惰・意志の消失
+  [
+    {text:'周りの雰囲気が乱れると、自分が何とかしなければと感じる'},
+    {text:'自分の意見より、場の空気を大切にしてしまうことが多い'},
+    {text:'何も決められずに、ぼんやりと時間が過ぎていくことがある'},
+    {text:'誰かを傷つけるくらいなら、自分が我慢する方を選ぶ'},
+    {text:'自分が本当に何をしたいのか、よくわからなくなることがある'},
+    {text:'怒りを感じても、直接伝えずに飲み込んでしまう'},
+    {text:'大切な人の感情に引っ張られて、自分の気持ちを見失うことがある'},
+    {text:'変化や新しい環境に、なかなか踏み出せないことがある'},
+    {text:'「平和でいること」を保つために、自分を押し殺していることがある'},
+    {text:'自分の存在が、誰かの邪魔になっていないか気になる'},
+    {text:'誰かに依存することで、安心感を得ていることがある'},
+    {text:'問題を先送りにして、あとで困ることが繰り返されている'},
+  ],
+  // 4 イチキシマヒメ（獅子座・タイプ3 達成者）── 承認欲求・演じる自己・失敗恐怖
+  [
+    {text:'人に認められていないと、自分の価値が感じられないことがある'},
+    {text:'結果を出さなければ、愛されないという感覚がある'},
+    {text:'「素の自分」より、期待に応える自分を演じる方が安心だ'},
+    {text:'失敗や恥ずかしい過去を、なかったことにしたくなる'},
+    {text:'忙しくしていないと、自分が何者かわからなくなる気がする'},
+    {text:'評価されたいという気持ちが、本当にやりたいことを邪魔することがある'},
+    {text:'弱みや迷いを人に見せることが、なかなかできない'},
+    {text:'成功しても心から喜べず、「まだ足りない」と感じることがある'},
+    {text:'他者の目線が気になって、自分の本音に気づくのが遅れる'},
+    {text:'人と比べて「自分は劣っている」と感じる瞬間がある'},
+    {text:'「かっこいい自分」を守るために、助けを求められないことがある'},
+    {text:'本当にやりたいことより、評価される道を選んでしまうことがある'},
+  ],
+  // 5 トヨウケヒメ（乙女座・タイプ2 助ける人）── 与え続ける・自己ニーズ無視・見返り期待
+  [
+    {text:'誰かの役に立てていないと、自分がここにいていいのか不安になる'},
+    {text:'「助けてほしい」という言葉が、なかなか言えない'},
+    {text:'人の世話をしながら、心のどこかで「なぜ感謝してくれないのか」と思うことがある'},
+    {text:'自分の気持ちより先に、相手が何を求めているかを考えてしまう'},
+    {text:'尽くしても報われない関係に、ずっといてしまうことがある'},
+    {text:'「ノー」と言えずに引き受けて、後から後悔することがある'},
+    {text:'自分自身のために時間やお金を使うと、罪悪感を感じることがある'},
+    {text:'感謝されないと、強い落胆や怒りが出ることがある'},
+    {text:'相手に何かしてあげることで、関係をつなぎとめようとすることがある'},
+    {text:'自分がどれだけ疲弊していても、助けを求めることに抵抗がある'},
+    {text:'「自分のニーズは後回しでいい」という感覚が染みついている'},
+    {text:'愛情を行動（贈り物・サポート）で示さないと、不安になる'},
+  ],
+  // 6 セオリツヒメ（天秤座・タイプ9 平和主義者）── 対立恐怖・決断できない・自己犠牲
+  [
+    {text:'人と意見が違うとき、つい自分の意見を引っ込めてしまう'},
+    {text:'「どちらでもいい」と言いながら、本当はちゃんと希望がある'},
+    {text:'誰かをがっかりさせることへの恐れが、決断を遅らせている'},
+    {text:'調和を保つために、自分の気持ちを後回しにしていることがある'},
+    {text:'「嫌われるかもしれない」という不安が、行動を止めることがある'},
+    {text:'自分がどうしたいかより、場全体がどうなるかを先に考える'},
+    {text:'怒りを感じても、外に出せず気づかないふりをしてしまう'},
+    {text:'人に合わせすぎて、自分が何を感じているかわからなくなることがある'},
+    {text:'「目立たないほうが安全」という感覚がある'},
+    {text:'優柔不断と言われることがあり、自分でも歯がゆいことがある'},
+    {text:'誰かとの関係が壊れることへの恐れが、言いたいことを飲み込ませる'},
+    {text:'波風を立てないことが、自分の安全を守る方法だと感じている'},
+  ],
+  // 7 イザナミ（蠍座・タイプ6 忠実家）── 不安・疑い・テスト行動・虚栄への逃避
+  [
+    {text:'最悪の事態を想定しないと、動き出せないことがある'},
+    {text:'信頼していた人が、急に怖く見えることがある'},
+    {text:'誰かの言葉の裏に「本当の意図」があるのではと探してしまう'},
+    {text:'「また裏切られるかもしれない」という恐れが、人を近づけさせない'},
+    {text:'権威ある人に過度に頼るか、強く反発するかどちらかになりやすい'},
+    {text:'本当の感情を隠して、強さを装うことがある'},
+    {text:'物事が順調なときほど、「何かまずいことが起きるはず」と不安になる'},
+    {text:'一度信頼を失うと、完全に回復することがなかなかできない'},
+    {text:'「安心できる場所」を求めながら、本当に安心することが怖い'},
+    {text:'確認を繰り返しても、それでも安心できないことがある'},
+    {text:'自分の弱さを知られると、攻撃されると感じることがある'},
+    {text:'大切な人の気持ちを「試す」ような行動をとってしまうことがある'},
+  ],
+  // 8 ククリヒメ（射手座・タイプ2 助ける人）── 境界線のなさ・与えることで存在証明
+  [
+    {text:'誰かが悲しんでいると、自分のことのように感じてしまう'},
+    {text:'人の痛みを「なかったことにしてあげたい」と思いすぎることがある'},
+    {text:'自分の感情と他者の感情の境界が、ときどきわからなくなる'},
+    {text:'「助けてあげないと」という衝動に、気づかぬうちに動かされている'},
+    {text:'尽くした分だけ「返ってくるはず」という期待が、ひそかにある'},
+    {text:'誰かが自分を必要としてくれないと、居場所がない気がする'},
+    {text:'相手のことを「自分がいないとダメ」と思っていることがある'},
+    {text:'感情的になりすぎて、かえって相手を疲れさせてしまうことがある'},
+    {text:'自分のニーズを後回しにしすぎて、燃え尽きることがある'},
+    {text:'「ここにいていい」と感じるために、誰かの役に立とうとする'},
+    {text:'断られると、自分の全てを否定されたような感覚になることがある'},
+    {text:'「与えるほど愛される」と、どこかで信じている'},
+  ],
+  // 9 イワナガヒメ（山羊座・タイプ1 改革者）── 完璧主義・内なる批判・感情爆発
+  [
+    {text:'自分の行動や言葉に対して、厳しく正しさを求めてしまう'},
+    {text:'「もっとうまくできたはず」という後悔が、長く残ることがある'},
+    {text:'誰かのやり方が間違っていると感じると、我慢できないことがある'},
+    {text:'「こうあるべき」という基準が高すぎて、自分も他人も苦しくなることがある'},
+    {text:'感情を出すのは弱さだ、という感覚がある'},
+    {text:'手を抜いている人を見ると、腹が立つことがある'},
+    {text:'怒りをずっと溜め込んで、ある瞬間に爆発させてしまうことがある'},
+    {text:'正しいことを言っているのに、なぜわかってもらえないのかと孤独を感じる'},
+    {text:'自分を褒めること、労うことが、なんとなく苦手だ'},
+    {text:'不完全なものをそのまま出すことへの、強い抵抗感がある'},
+    {text:'自分に課したルールを誰かが破ると、強いストレスを感じる'},
+    {text:'周りの人に「もっとがんばれるはず」と言いたくなることがある'},
+  ],
+  // 10 アメノサグメ（水瓶座・タイプ5 観察者）── 感情切り離し・孤立・行動できない
+  [
+    {text:'感情より頭で物事を整理する方が、ずっと楽だ'},
+    {text:'人が多い場所や長時間の人付き合いで、強い消耗感を感じる'},
+    {text:'感情を言葉にするより、分析・観察している方が自然だ'},
+    {text:'誰かと深く関わることへの、漠然とした恐れがある'},
+    {text:'十分な準備や知識が整わないと、動き出せない'},
+    {text:'一人でいる時間が絶対的に必要で、確保できないと不安になる'},
+    {text:'相手に「どうしてそう感じるの？」と聞かれると、答えるのに困る'},
+    {text:'感情的な話題になると、話を分析や情報に変えてしまう'},
+    {text:'人に頼んだり、助けを求めたりすることへの強い抵抗がある'},
+    {text:'「自分はわかってもらえない存在だ」という孤独が、慢性的にある'},
+    {text:'行動に移す前に考えすぎて、機会を逃すことがある'},
+    {text:'感情より論理でつながろうとして、関係が深まらないことがある'},
+  ],
+  // 11 オオゲツヒメ（魚座・タイプ4 個性的な人）── 幻想への逃避・自己犠牲・理想と現実のギャップ
+  [
+    {text:'現実より、想像や夢の世界の方が居心地よく感じることがある'},
+    {text:'「いつかこうなれるはず」という理想に、今が追いついていないと感じる'},
+    {text:'自分を犠牲にすることで、関係を保とうとすることがある'},
+    {text:'傷ついた出来事を、何度も心の中で繰り返してしまう'},
+    {text:'誰かに完全にわかってもらうことへの、強い渇望がある'},
+    {text:'感情の波に巻き込まれて、日常のことが手につかなくなることがある'},
+    {text:'人の痛みに感情移入しすぎて、自分が疲れることがある'},
+    {text:'「どうせ私なんて」という気持ちが、ふと出てくることがある'},
+    {text:'現実的な問題より、意味や感情の方が大事に思えることがある'},
+    {text:'親密になるほど、失うことへの恐れが増してくる'},
+    {text:'何かを始めるとき、「完璧なタイミング」を待ちすぎることがある'},
+    {text:'「もっと美しい何か」への憧れが、今の自分を不十分に感じさせる'},
+  ],
+];
+function getQ(){ return ALL_QUESTIONS[S.sunIdx] || ALL_QUESTIONS[0]; }
+const LIKERT = ['全くそう思わない','あまり思わない','どちらでもない','ややそう思う','強くそう思う'];
+
+/* ══════════════════════════════════════
+   PREMIUM CONTENT（有料PDF専用）
+══════════════════════════════════════ */
+const PREMIUM_DATA = [
+  { // 0 スセリビメ（牡羊座・タイプ8）
+    letter:`あなたは、鎧を纏って生まれてきたのではない。でも、いつの間にか鎧を着ることを覚えた。傷つかないために。支配されないために。誰かの弱さにつけ込まれないために。\n\n私はスセリビメ。オオクニヌシの妻となるために、蛇の部屋も、ムカデの部屋も、炎の中も通り抜けた。あなたが「強くあろうとする」こと、その奥底に何があるか、私はよく知っている。\n\n本当の勇気とは、鎧を脱ぐことだ。弱さを見せること、助けを求めること、泣くこと——それはあなたが思っているほど、あなたを壊さない。むしろ、その瞬間こそ、誰かがあなたの側に来ることができる。\n\nあなたの力は本物だ。ただ、その力の使い方を変える時が来ている。支配するための力から、つながるための力へ。孤独に耐える力から、共に在る力へ。\n\n私の夫は、幾度も死にかけながら私のもとに帰ってきた。それは彼が強かったからではなく、愛が彼を引き戻したからだ。あなたにも、そういう愛の場所がある。それはあなたが鎧を脱いだときに、初めて見えてくる。`,
+    works:['月に1回、「助けてください」と誰かに言う練習をする','怒りを感じたとき、すぐ行動する前に5分だけ一人でその感情に居続ける','信頼できる人に、今週「傷ついたこと」を一つ話す'],
+    ritual:`夜、一人になれる場所で胸に手を当てる。「私は弱くていい」と3回声に出して言う。最初は違和感があるはず。その違和感の重さが、あなたが長い間抑えてきた柔らかさの重さだ。`
+  },
+  { // 1 ウケモチ（牡牛座・タイプ4）
+    letter:`あなたは「自分だけ違う」と感じながら生きてきた。その感覚は、孤独でもあり、誇りでもある。でも時々、その「違う」が呪いのように感じられることがある——違うから、わかってもらえない。違うから、選ばれない。違うから、本当の自分でいると傷つく。\n\n私はウケモチ。食と生命を司る女神。私の体から五穀や魚が生まれたように、あなたの内側にも、まだ誰にも見せていない豊かさがある。\n\nあなたが羨む「あの人」が持っているものは、本当に欲しいものではないことが多い。あなたが本当に渇望しているのは、「ちゃんとわかってもらえた」という感覚だ。\n\nひとつだけ教えよう。わかってもらう前に、まず自分が自分をわかること。あなたの感情の激しさも、理想への渇望も、過去への執着も——すべては、あなたがどれだけ深く感じる魂を持っているかの証だ。その深さを恥じなくていい。`,
+    works:['毎朝1行、その日感じた感情を日記に書く（評価せずに、ただ書く）','「あの人がいいな」と思ったとき、「自分が本当に欲しいものは何か」と問い直す','過去の美しい記憶を一つ選んで、今の自分への贈り物として受け取り直す'],
+    ritual:`食事の前に一度止まり、「この食べ物が今の私を作る」と意識する。食べることは、今この瞬間の現実に戻ること。ウケモチの力は、地に足つけた「今」にある。`
+  },
+  { // 2 アメノウズメ（双子座・タイプ7）
+    letter:`あなたは誰よりも「楽しいこと」を知っている。光の中で笑い、踊り、人を引きつける。でも、踊りが止まったとき——静かになったとき——一人でいるとき——あなたは何を感じているだろう？\n\n私はアメノウズメ。天岩戸の前で踊り、神々を笑わせ、世界に光を取り戻した女神。でも知っているかい？あの踊りの前、私も怖かった。岩戸の奥で泣いているアマテラスの声を聞きながら、それでも踊ることを選んだ。\n\nあなたが「楽しいこと」に向かうとき、その奥に何かから逃げているものがある。それは弱さじゃない。ただ、そのうち一度だけ、逃げずに立ち止まってみてほしい。\n\n痛みは、あなたが思っているほど長くは続かない。感じることで消えるのに、感じないようにするから溜まっていく。岩戸を開けるのに必要だったのは光の踊りだったけれど——その前に、暗闇の中で踊る勇気が必要だった。`,
+    works:['週に1時間、何も予定を入れない「何もしない時間」を作る','「楽しくない」と感じたとき、すぐ別のことに移らず10分だけその感情に居続ける','最近避けてきた「重い話」を、信頼できる人と一度だけする'],
+    ritual:`鏡の前に立ち、笑顔を作らずに自分の目を見る。1分間、表情を変えずに自分を見続ける。それがあなたの「踊っていないとき」の自分だ。その自分も、同じように愛されていい。`
+  },
+  { // 3 トヨタマヒメ（蟹座・タイプ9）
+    letter:`あなたは水のように、周りに合わせて形を変えてきた。誰かが怒れば静め、誰かが悲しめば包み込む。それはあなたの美しさだ。でも、あまりに長く合わせ続けると、自分の本来の形が何だったか、わからなくなる。\n\n私はトヨタマヒメ。海神の娘。山幸彦を三年間、海の宮殿で守り続けた。でも出産のとき「絶対に見ないでほしい」とお願いしたのに、彼は見てしまった。私の本当の姿を——鰐の姿を——。あなたにも、人に見せていない「本当の姿」がある。それが恐ろしいものだとあなたは思っている。でも私の話の続きを聞いてほしい。私が海に帰った後も、息子のために乳母を送り、和歌を詠み続けた。「見られた」後も、愛することをやめなかった。\n\n本当の平和は、自分を消すことで生まれるのではない。自分が何を感じているかを知り、それをやさしく伝えることで生まれる。あなたの声は、海の波のように、確かにここにある。`,
+    works:['毎日一つ「今日の私は〇〇がしたい」という文を書く（誰かのためではなく、自分のために）','誰かに合わせそうになったとき、「私は本当はどうしたい？」と一度問う','先送りしてきたことを一つ選んで、今月中に着手する'],
+    ritual:`水（お風呂、川、海）に触れながら「私は何を感じている？」と問いかける。水は正直だ。答えは言葉ではなく、感覚として来る。その感覚を、大切に受け取る。`
+  },
+  { // 4 イチキシマヒメ（獅子座・タイプ3）
+    letter:`あなたは輝くために生まれてきた。それは本当のことだ。でも「輝かなければ愛されない」という信念も、どこかでしっかり根を張ってしまっている。\n\n私はイチキシマヒメ。宗像三女神の一柱。美と芸術と航海の女神として崇められてきた。でも私が美しいのは、誰かに見られているからではない。私の本質そのものが、美だからだ。\n\nあなたが「結果」を求めるとき、その奥に何があるだろう？認められたい、愛されたい、「いてよかった」と言われたい——それは人間として当然の渇望だ。でも、その渇望を外側で満たそうとし続けると、どんなに輝いても虚しさは消えない。\n\n一度だけ試してほしいことがある。何も達成しない日を作って、ただ「今日の私」でいることだ。褒められなくても、結果がなくても、あなたはここにいていい。その感覚が怖いなら——それこそが、次に向かうべき場所だ。`,
+    works:['週に一度、「何も生産しない休日」を作る（SNSも見ない）','誰かに褒められたとき、「ありがとう」と素直に受け取る練習をする（否定しない）','「楽しいからやっていること」と「評価されたいからやっていること」を紙に書き分ける'],
+    ritual:`鏡の前で自分の目を見て「私は何もしなくても、ここにいていい」と言う。信じられないなら、信じられるようになるまで毎朝続ける。これがあなたの最も勇気のいるワークだ。`
+  },
+  { // 5 トヨウケヒメ（乙女座・タイプ2）
+    letter:`あなたはずっと、誰かのために動いてきた。誰かが困れば手を差し伸べ、誰かが求めれば応じ、自分の疲れより相手の笑顔を優先してきた。その優しさは本物だ。でも、一つ聞かせてほしい。\n\nあなたは今、本当に何をしたいと思っている？\n\n私はトヨウケヒメ。食物と農業の女神。すべての生命を養う力を持ちながら、私自身も「養われること」を知っている。大地は与えるだけでなく、雨を受け、太陽を受け、季節ごとに休む。それが豊かさの循環だ。\n\n与え続けることは美しい。でも受け取ることを拒否することは、愛から来ているように見えて——じつは深いところで「自分は受け取る価値がない」という信念から来ていることがある。\n\nあなたが本当に欲しいものを、声に出して言う練習を始めよう。「〇〇が欲しい」「〇〇してほしい」——その言葉があなたの口から出るとき、あなたの魂は少しずつ、本来の豊かさに戻っていく。`,
+    works:['毎日、誰かに何か一つ「お願い」をする（小さなことでいい）','「ノー」と言う練習を週一回する','自分のためだけのことに、1時間と少しのお金を使う日を作る'],
+    ritual:`満月の夜（または満月の画像の前で）、自分の手のひらを空に向けて開く。「私も受け取っていい」と声に出す。与えることに慣れた手が、受け取るために開く感覚を、体で覚える。`
+  },
+  { // 6 セオリツヒメ（天秤座・タイプ9）
+    letter:`あなたは調和を愛している。それは本物の愛だ。でも、あなたが守っている「平和」の中に、あなた自身の声はちゃんと入っているだろうか？\n\n私はセオリツヒメ。祓いの女神。川の流れに罪穢れを流す力を持つ。でも「流す」ということは、まず「受け取る」ことだ。ないことにするのではなく、確かに感じて、その上で手放す——それが本物の浄化だ。\n\nあなたが「どちらでもいい」と言うとき、本当はそう思っていないことが多いはず。あなたの中にはちゃんと「こうしたい」という声がある。それを出さないでいるのは、その声が弱いからではなく、出した後のことが怖いからだ。\n\nあなたの「こうしたい」は、誰かを傷つけるものではない。むしろ、その声を聞かせてくれることで、相手は初めて「本当のあなた」に会えるのだ。あなたが消えることで守られる関係より、あなたがいることで豊かになる関係を、選ぶ時が来ている。`,
+    works:['誰かに何かを聞かれたとき、即答せず「少し考えてもいいですか」と言う練習をする','自分の意見を一日一回、誰かに伝える（小さなことでいい）','「嫌だな」と感じたことを日記に書く（伝えなくていい、まず気づくことが先）'],
+    ritual:`川や流れる水の前に立ち「私の声も、ここに流れていい」と言う。自分の意見を出すことへの恐れを、水に流すイメージをする。これを繰り返すことで、少しずつ声が出やすくなる。`
+  },
+  { // 7 イザナミ（蠍座・タイプ6）
+    letter:`あなたはずっと、「また裏切られるかもしれない」という恐れを抱えながら生きてきた。だから最悪を想定し、相手の真意を探り、確かめ、それでも不安が消えない。その繰り返し。\n\n私はイザナミ。日本の国土を生んだ女神。死の国の主となった後も、かつて愛したイザナキが会いに来た。私は「見ないでほしい」と言った。でも彼は見た。そして逃げた。\n\n信頼が崩れる痛みは、この世で最も深い痛みの一つだ。\n\nでも今、あなたに伝えたいのはこのことだ。あなたの警戒心は、かつてのあなたを守るために生まれた、賢い防衛だった。でも今の安全を確かめるために、過去の痛みのフィルターで見続けることは、今の相手を「かつての誰か」にしてしまう。\n\n安心は、外側から与えられるものではない。自分の中に「ここは大丈夫だ」という場所を作ること——それがあなたの次の課題だ。`,
+    works:['「この人は信頼できるか」を確認したくなったとき、「今までその人が裏切ったことがあるか」を振り返る','不安が出たとき、「これは今の不安か、過去の記憶か」と自問する','安心できる場所（物理的な場所）を一つ、意識的に作る'],
+    ritual:`胸に手を当てて「私は今、安全だ」と言う。信じられなくても言う。不安が出てきたとき何度でも言う。これはイザナミが黄泉の国から声を届けるように——あなたが自分の魂に語りかける言葉だ。`
+  },
+  { // 8 ククリヒメ（射手座・タイプ2）
+    letter:`あなたはすべての「あいだ」をつなぐ力を持っている。人と人、言葉と沈黙、生と死——あなたがいるところで、断絶はつながりになる。でも、あなた自身は、今どこにつながれているだろう？\n\n私はククリヒメ。イザナキとイザナミが言い争う最中に突然現れ、何かを伝えて去った。その言葉は記録されていない。でも、その場の空気が変わったことは、確かだ。\n\nあなたが誰かを救おうとするとき、「もし助けられなかったら、私はここにいてはいけない」という感覚——そこが出発点になっていないか、確かめてほしい。\n\nあなたの価値は、誰かを救えるかどうかで決まらない。あなたがそこに「いる」こと、それ自体がすでに光だ。縁結びの本質は、相手を変えることではなく、ありのままに隣にいることだ。その力を、まず自分自身に向けてほしい。`,
+    works:['「助けたい」衝動が来たとき、「相手が本当に求めているか」を確かめてから動く','自分が「もらってもいい」ものを一つ毎日意識する','人の感情に共鳴しすぎたとき、足が地についているかを感じて自分に意識を戻す'],
+    ritual:`両手を胸の前で組んで「私は私とつながっている」と言う。他者との縁をつなぐ前に、自分自身との縁を確かめる。これがククリヒメのワークだ。`
+  },
+  { // 9 イワナガヒメ（山羊座・タイプ1）
+    letter:`あなたは正しくあろうとしてきた。それがどれほど疲れることか、私は知っている。内側で「もっとうまくできた」「なぜわかってもらえない」「あの人はなぜ手を抜くのか」——その声が止まらない。\n\n私はイワナガヒメ。岩のような永続性を司る女神。妹コノハナサクヤヒメとともに送り出されたが、その容姿ゆえに送り返された。私は泣いた。怒った。そして「人の命は花のように短くなるだろう」と呪いの言葉を放った。\n\nあなたも知っているはずだ。怒りが爆発したとき、後から「言いすぎた」と思う感覚を。あの怒りの奥には、「私の価値を認めてもらえなかった」という深い痛みがある。\n\nあなたの厳しさは、最初は自分への厳しさから始まった。でもそろそろ、その判事に休暇を与えていい。不完全なままで、季節の花のように、今ここに咲いていい。`,
+    works:['「もっとうまくできた」という声に気づいたとき、「今日の自分はよくやった」に言い換える','誰かのやり方が気になったとき、「これは自分に関係あることか」を先に問う','自分の「不完全」を一つ、誰かに笑い話として話す'],
+    ritual:`岩や石を一つ手に持ち、その重さを感じながら「私はこのままで、十分に価値がある」と言う。イワナガヒメの力は変わらない価値の中にある。それはあなたの完璧さではなく、あなたの存在そのものだ。`
+  },
+  { // 10 アメノサグメ（水瓶座・タイプ5）
+    letter:`あなたは世界をよく見ている。人の動機を読み、情報を集め、一人でいるときにもっとも深く考える。その観察力は、あなたの魂の本質だ。でも、観察しながら「参加しない」ことで、何かを失ってきたことはないだろうか？\n\n私はアメノサグメ。タジカラオが岩戸を開けるのを止め、アマテラスを完全に引き出す役割を担った女神。ただ力で引き出すのではなく、「今だ」というタイミングを知る——それが私の力だ。\n\nあなたはいつも「準備ができたら動く」と思っている。でも、完全な準備が整うことは、ほとんどない。知識は行動の代わりにはなれない。「わかる」と「体で感じる」は、別のことだ。\n\nあなたが恐れているのは、つながることで「一人でいられる空間」が侵食されることだ。でも少しだけ窓を開けてみてほしい。あなたが思っているほど、つながることはあなたを消耗させない。正しい相手となら、むしろ満ちてくる。`,
+    works:['「十分に調べてから」と思ったとき、70%の準備で一度動いてみる','感情を分析するのではなく、「今、体のどこで感じているか」を確かめる','週に一度、誰かと「何かを一緒にする」時間を作る（体を動かすことが理想）'],
+    ritual:`両目を閉じて、自分の体の感覚だけに集中する。頭を使わず、ただ感じる。5分間「考えない」時間を作る。これがアメノサグメのワーク——岩戸を開ける前の、静かな待機の力だ。`
+  },
+  { // 11 オオゲツヒメ（魚座・タイプ4）
+    letter:`あなたは世界をとても美しく感じる魂を持っている。その感受性は、誰もが持っているわけではない、あなたの特別な力だ。でも同時に、その力ゆえに疲れることも、傷つくことも、人の何倍もある。\n\n私はオオゲツヒメ。食物の神として、自らの体からすべてを生み出した。そして命を落とした後も、その体から穀物や蚕が生まれた。死してなお、豊かさを世界に与え続けた。あなたも似ている。自分を削るように感じながら、それでも誰かのために自分を注ぎ続ける。\n\nでもあなたの豊かさは、削ることで枯れるものではない。あなたの感受性は、ちゃんと補充される。美しいものを見るとき、音楽を聴くとき、自然の中にいるとき——あなたの魂は満ちる。\n\n「どうせ私なんて」という声が出たとき、それはあなたの真実ではない。それは、長い間自分を犠牲にし続けた疲れの声だ。今日、一つだけ、あなたのためだけに美しいものを選んでほしい。それがあなたへの、私からの贈り物だ。`,
+    works:['「今日感じた美しいもの」を毎日一つ書き留める','誰かのために何かをする前に、「自分は今満ちているか」を確かめる','「どうせ私なんて」という声が出たとき、「これは今の声か、疲れの声か」と問い直す'],
+    ritual:`月明かりの下（または月の写真の前）で目を閉じ「私は満ちている」と言う。感じられなくていい。言葉が先に来て、感覚があとからついてくる。これがオオゲツヒメの種まきのワークだ。`
+  },
+];
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let S = { sunIdx:-1, moonIdx:-1, answers:[] };
+
+/* ══════════════════════════════════════
+   SCORE LEVEL
+══════════════════════════════════════ */
+function scoreLevel(total){
+  if(total<=12) return {label:'覚醒の段階', desc:'あなたの魂はすでに突破口を開いています。次のステージへ進む準備が整っています。', tier:4};
+  if(total<=24) return {label:'気づきの段階', desc:'意識が目覚め始めています。影に気づいている自分を大切に認めてください。', tier:3};
+  if(total<=36) return {label:'突破の瀬戸際', desc:'今まさに変容のタイミング。闇が最も深い時、光も最も近くにあります。', tier:2};
+  return {label:'闇の深処', desc:'この重さこそ、変容の始まりです。あなたの魂は今、脱皮しようとしています。', tier:1};
+}
+
+/* ══════════════════════════════════════
+   ASTRONOMY
+══════════════════════════════════════ */
+function toJD(yr,mo,dy,hr,mn,utcOff){
+  let ut=hr+mn/60-utcOff, d=dy+ut/24;
+  if(mo<=2){yr--;mo+=12;}
+  const A=Math.floor(yr/100), B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(yr+4716))+Math.floor(30.6001*(mo+1))+d+B-1524.5;
+}
+function sunLon(jd){
+  const T=(jd-2451545)/36525;
+  const M=(357.5291092+35999.0502909*T)*Math.PI/180;
+  const L0=280.46646+36000.76983*T;
+  const C=(1.9146-0.004817*T)*Math.sin(M)+(0.019993-0.000101*T)*Math.sin(2*M)+0.00029*Math.sin(3*M);
+  return((L0+C)%360+360)%360;
+}
+function moonLon(jd){
+  const T=(jd-2451545)/36525;
+  let L0=218.3164477+481267.88123421*T-0.0015786*T*T;
+  const D=(297.8501921+445267.1114034*T)*Math.PI/180;
+  const M=(134.9633964+477198.8675055*T)*Math.PI/180;
+  const Ms=(357.5291092+35999.0502909*T)*Math.PI/180;
+  const F=(93.2720950+483202.0175233*T)*Math.PI/180;
+  const dL=6288774*Math.sin(M)+1274027*Math.sin(2*D-M)+658314*Math.sin(2*D)
+           +213618*Math.sin(2*M)-185116*Math.sin(Ms)-114332*Math.sin(2*F)
+           +58793*Math.sin(2*D-2*M)+57066*Math.sin(2*D-Ms-M)+53322*Math.sin(2*D+M)
+           +45758*Math.sin(2*D-Ms)-40923*Math.sin(Ms-M)-34720*Math.sin(D)
+           -30383*Math.sin(Ms+M)+15327*Math.sin(2*D-2*F);
+  return((L0+dL/1e6)%360+360)%360;
+}
+function lonToIdx(lon){return Math.floor(((lon%360)+360)%360/30);}
+function calcAstro(){
+  const dateVal=document.getElementById('f-date').value;
+  if(!dateVal) return false;
+  const timeVal=document.getElementById('f-time').value||'12:00';
+  const place=document.getElementById('f-place').value.split(',').map(Number);
+  const utcOff=Math.round(place[0]/15);
+  const [yr,mo,dy]=dateVal.split('-').map(Number);
+  const [hr,mn]=timeVal.split(':').map(Number);
+  const jd=toJD(yr,mo,dy,hr,mn,utcOff);
+  S.sunIdx=lonToIdx(sunLon(jd));
+  S.moonIdx=lonToIdx(moonLon(jd));
+  return true;
+}
+
+/* ══════════════════════════════════════
+   SCREEN
+══════════════════════════════════════ */
+function go(name){
+  ['top','birth','questions','result'].forEach(s=>{
+    const el=document.getElementById('s-'+s);
+    if(el) el.style.display='none';
+  });
+  const t=document.getElementById('s-'+name);
+  if(t){t.style.display='block';t.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+
+/* ══════════════════════════════════════
+   BIRTH CHANGE
+══════════════════════════════════════ */
+function onBirthChange(){
+  if(!calcAstro()) return;
+  const sun=GODDESSES[S.sunIdx], moon=GODDESSES[S.moonIdx];
+  document.getElementById('pv-sun-sign').textContent=sun.sign+' ('+sun.en+')';
+  document.getElementById('pv-sun-goddess').textContent=sun.goddess;
+  document.getElementById('pv-sun-theme').textContent=sun.theme;
+  document.getElementById('pv-moon-sign').textContent=moon.sign+' ('+moon.en+')';
+  document.getElementById('pv-moon-goddess').textContent=moon.goddess;
+  document.getElementById('pv-moon-theme').textContent=moon.theme;
+  const isNoon=document.getElementById('f-time').value==='12:00';
+  document.getElementById('pv-note').textContent=isNoon
+    ?'※ 時刻が12:00のため、月星座に誤差が生じる場合があります。'
+    :'※ 月星座は簡易天文計算による推定値です（精度±1〜2度）。';
+  document.getElementById('zodiac-preview').classList.add('visible');
+}
+
+/* ══════════════════════════════════════
+   BUILD QUESTIONS
+══════════════════════════════════════ */
+function buildQ(){
+  const qs=getQ();
+  const sun=GODDESSES[S.sunIdx];
+  // イントロ文を更新
+  const intro=document.getElementById('q-intro');
+  if(intro){
+    intro.innerHTML=`<span class="q-intro-goddess">${sun.goddess}</span> の影のテーマに特化した12問です。<br>直感で、今の自分に正直に答えてください。`;
+  }
+  const el=document.getElementById('q-list');
+  el.innerHTML=qs.map((q,i)=>`
+    <div class="q-block">
+      <div class="q-no">Q ${String(i+1).padStart(2,'0')}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="likert">
+        ${LIKERT.map((l,j)=>`
+          <label>
+            <input type="radio" name="q${i}" value="${j}" onchange="updProg()">
+            <span class="l-btn">${j+1}<br><span style="font-size:9px">${l}</span></span>
+          </label>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function updProg(){
+  const qs=getQ();
+  const done=qs.filter((_,i)=>document.querySelector(`input[name=q${i}]:checked`)).length;
+  document.getElementById('prog-fill').style.width=(done/qs.length*100)+'%';
+  document.getElementById('prog-label').textContent=`${done} / ${qs.length}`;
+}
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+function goBirth(){
+  if(!document.getElementById('f-date').value){
+    document.getElementById('err-birth').classList.add('on'); return;
+  }
+  document.getElementById('err-birth').classList.remove('on');
+  if(!calcAstro()) return;
+  buildQ();
+  go('questions');
+}
+function goResult(){
+  const qs=getQ();
+  const missing=qs.some((_,i)=>!document.querySelector(`input[name=q${i}]:checked`));
+  if(missing){document.getElementById('err-q').classList.add('on');return;}
+  document.getElementById('err-q').classList.remove('on');
+  S.answers=qs.map((_,i)=>+document.querySelector(`input[name=q${i}]:checked`).value);
+  renderResult();
+  saveHist();
+  go('result');
+}
+
+/* ══════════════════════════════════════
+   MYTH TABS
+══════════════════════════════════════ */
+function switchMythTab(id){
+  document.querySelectorAll('.myth-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.myth-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('mtab-'+id).classList.add('active');
+  document.getElementById('mpanel-'+id).classList.add('active');
+}
+
+/* ══════════════════════════════════════
+   RENDER RESULT
+══════════════════════════════════════ */
+function renderResult(){
+  const sun=GODDESSES[S.sunIdx];
+  const moon=GODDESSES[S.moonIdx];
+  const total=S.answers.reduce((a,b)=>a+b,0);
+  const sl=scoreLevel(total);
+  const nextG=GODDESSES[sun.nextIdx];
+  const phase=PHASES[sun.phase-1];
+  const isLastCycle=(sun.cyclePos===12);
+  const sunSame=(S.sunIdx===S.moonIdx);
+
+  // Hero
+  document.getElementById('r-glyph').textContent=sun.glyph;
+  document.getElementById('r-label').textContent=sun.sign+' · '+sun.en;
+  document.getElementById('r-name').textContent=sun.goddess;
+  document.getElementById('r-theme').textContent=sun.theme;
+  document.getElementById('r-copy').textContent=sun.message;
+
+  // Phase bar
+  document.getElementById('r-phase-bar').innerHTML=PHASES.map(p=>`
+    <div class="phase-item ${p.cssClass} ${sun.phase===p.no?'active':''}">
+      <div class="phase-num">Phase ${p.no}</div>
+      <div class="phase-name">${p.title}</div>
+      <div class="phase-sub">${p.sub}</div>
+    </div>`).join('');
+
+  // Evolution status
+  document.getElementById('r-evo-status').innerHTML=`
+    <div class="evo-status-label">あなたの現在地</div>
+    <div class="evo-cycle">魂の進化サイクル ─ 第 ${sun.cyclePos} 番目の女神　フェーズ${sun.phase}：${phase.title}</div>
+    <div class="evo-tier tier-${sl.tier}">${sl.label}</div>
+    <div class="evo-tier-desc">${sl.desc}</div>
+    <div class="evo-detail">
+      <div class="evo-row">
+        <span class="evo-lbl">闇のテーマ</span>
+        <span class="evo-val">${sun.shadow}</span>
+      </div>
+      <div class="evo-row">
+        <span class="evo-lbl">覚醒のテーマ</span>
+        <span class="evo-val">${sun.awakening}</span>
+      </div>
+    </div>`;
+
+  // Sun / Moon boxes
+  document.getElementById('r-sun').textContent=sun.goddess;
+  document.getElementById('r-sun-sign').textContent=sun.sign+' — '+sun.theme;
+  document.getElementById('r-moon').textContent=moon.goddess;
+  document.getElementById('r-moon-sign').textContent=moon.sign+' — '+moon.theme;
+
+  // Mythology tabs
+  const moonMythHTML=sunSame?'':`
+    <div class="myth-tab" id="mtab-moon" onclick="switchMythTab('moon')">☽ ${moon.goddess} の神話</div>`;
+  const moonPanelHTML=sunSame?'':`
+    <div class="myth-panel" id="mpanel-moon">
+      <div class="myth-source">${moon.mythSource}</div>
+      <div class="myth-story">${moon.myth}</div>
+      <div class="myth-connect-label">コンセプトとの接点</div>
+      <div class="myth-connect">${moon.mythConnect}</div>
+    </div>`;
+  document.getElementById('r-myth-section').innerHTML=`
+    <div class="myth-tab-row">
+      <div class="myth-tab active" id="mtab-sun" onclick="switchMythTab('sun')">☀ ${sun.goddess} の神話</div>
+      ${moonMythHTML}
+    </div>
+    <div class="myth-panel active" id="mpanel-sun">
+      <div class="myth-source">${sun.mythSource}</div>
+      <div class="myth-story">${sun.myth}</div>
+      <div class="myth-connect-label">コンセプトとの接点</div>
+      <div class="myth-connect">${sun.mythConnect}</div>
+    </div>
+    ${moonPanelHTML}`;
+
+  // Shadow (moon)
+  document.getElementById('r-shadow-name').textContent=moon.goddess;
+  document.getElementById('r-shadow-theme').textContent='テーマ：'+moon.theme;
+  document.getElementById('r-tension').textContent=moon.tension;
+  document.getElementById('r-fear').textContent=moon.fear;
+  document.getElementById('r-guard').textContent=moon.guard;
+
+  // Two Paths: 光（進化）& 闇（退行）
+  const darkG=GODDESSES[sun.darkIdx];
+  const cycleNote=isLastCycle?' ─ 新たな螺旋へ':'';
+  document.getElementById('r-two-path').innerHTML=`
+    <div class="path-ennea">
+      <span class="path-ennea-type">${sun.enneagram}</span>
+    </div>
+    <div class="path-row">
+      <div class="path-light">
+        <div class="path-dir">☀ 光の道（進化・統合）</div>
+        <div class="path-arrow">あなたが成長するとき →</div>
+        <div class="path-goddess">${nextG.goddess}</div>
+        <div class="path-theme">${nextG.sign} · ${nextG.theme}${cycleNote}</div>
+        <div class="path-desc">${sun.evolutionAdvice}</div>
+        <div class="path-advice">✦ ${sun.lightKey}</div>
+      </div>
+      <div class="path-dark">
+        <div class="path-dir">🌑 闇の道（退行・分裂）</div>
+        <div class="path-arrow">ストレスを抱えるとき →</div>
+        <div class="path-goddess">${darkG.goddess}</div>
+        <div class="path-theme">${darkG.sign} · ${darkG.theme}の闇</div>
+        <div class="path-desc">${sun.darkState}</div>
+        <div class="path-advice">↩ ${sun.darkAdvice}</div>
+      </div>
+    </div>`;
+  // legacy (hidden)
+  document.getElementById('r-next-step').innerHTML='';
+
+  // Kotodama
+  document.getElementById('r-kotodama').textContent='「'+moon.kotodama+'」';
+
+  // Profile
+  document.getElementById('r-hook').textContent=sun.hook;
+  document.getElementById('r-whisper').textContent=sun.whisper;
+  document.getElementById('r-color').textContent=sun.color;
+
+  // Premium Report
+  document.getElementById('r-premium').innerHTML=`
+    <div class="prem-section">
+      <div class="prem-label">本質的な性格</div>
+      <div class="prem-text">${sun.personality}</div>
+    </div>
+    <div class="prem-section">
+      <div class="prem-label">恋愛の癖</div>
+      <div class="prem-text">${sun.love}</div>
+    </div>
+    <div class="prem-section">
+      <div class="prem-label">人生でハマる落とし穴</div>
+      <div class="prem-text">${sun.pitfall}</div>
+    </div>
+    <div class="prem-section">
+      <div class="prem-label">本来の強み</div>
+      <div class="prem-text">${sun.strengths}</div>
+    </div>
+    <div class="prem-section">
+      <div class="prem-label">相性</div>
+      <div class="compat-grid">
+        <div class="compat-box good">
+          <div class="compat-type">◎ 相性の良いタイプ</div>
+          <div class="compat-names">${sun.compatible.replace(' / ','<br>')}</div>
+        </div>
+        <div class="compat-box avoid">
+          <div class="compat-type">▲ 注意が必要なタイプ</div>
+          <div class="compat-names">${sun.avoid.replace(' / ','<br>')}</div>
+        </div>
+      </div>
+    </div>`;
+  // カレンダーカードを表示
+  showCalCard();
+  renderStripePanel();
+}
+
+/* ══════════════════════════════════════
+   HISTORY
+══════════════════════════════════════ */
+function saveHist(){
+  const sun=GODDESSES[S.sunIdx];
+  const rec={date:new Date().toLocaleDateString('ja-JP'),goddess:sun.goddess,sign:sun.sign,theme:sun.theme,phase:sun.phase,cyclePos:sun.cyclePos};
+  let h=JSON.parse(localStorage.getItem('gd_hist')||'[]');
+  h.unshift(rec); h=h.slice(0,5);
+  localStorage.setItem('gd_hist',JSON.stringify(h));
+  // リマインダー用：診断日時・女神情報を保存
+  localStorage.setItem('gd_last_diag',JSON.stringify({
+    date:new Date().toISOString(),
+    goddess:sun.goddess, sign:sun.sign, sunIdx:S.sunIdx
+  }));
+}
+function loadHist(){
+  const h=JSON.parse(localStorage.getItem('gd_hist')||'[]');
+  if(!h.length) return;
+  document.getElementById('hist-panel').style.display='block';
+  document.getElementById('hist-list').innerHTML=h.map(r=>`
+    <div class="hist-row">
+      <div>
+        <span class="hist-goddess">${r.goddess}</span>
+        <span style="font-size:11px;color:var(--text-dim);margin-left:8px;">${r.sign} · ${r.theme}</span>
+      </div>
+      <span class="hist-meta">Phase${r.phase||'?'} · ${r.date}</span>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   STRIPE 課金
+══════════════════════════════════════ */
+// ▼ Stripeダッシュボードで発行したPayment LinkのURLをここに設定
+const STRIPE_URL = 'https://buy.stripe.com/YOUR_PAYMENT_LINK';
+// ▼ Stripeダッシュボード → Payment Link → 設定 → 確認ページ → カスタムURL に以下を設定：
+// https://uzumaki61876810-hub.github.io/goddess-diagnosis/?gd_paid=true
+
+function isPremiumUnlocked(){
+  return sessionStorage.getItem('gd_premium')==='true'
+      || localStorage.getItem('gd_premium_session')===String(S.sunIdx);
+}
+function renderStripePanel(){
+  const area=document.getElementById('stripe-btn-area');
+  if(!area) return;
+  if(isPremiumUnlocked()){
+    area.innerHTML=`
+      <button class="btn-dl-premium" onclick="dlPremiumPDF()">✦ 詳細PDFをダウンロード</button>
+      <div class="paid-note">✓ 決済済み — 何度でもダウンロードできます</div>`;
+  } else {
+    area.innerHTML=`
+      <button class="btn-buy" onclick="buyPremium()">詳細PDFレポートを取得する <span class="btn-buy-price">¥330</span></button>
+      <div class="paid-note">決済はStripeで安全に処理されます</div>`;
+  }
+}
+function buyPremium(){
+  // 診断状態を保存してStripeへ遷移
+  localStorage.setItem('gd_pending',JSON.stringify({
+    sunIdx:S.sunIdx, moonIdx:S.moonIdx, answers:S.answers
+  }));
+  window.location.href=STRIPE_URL;
+}
+function checkPaymentReturn(){
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('gd_paid')!=='true') return;
+  // URLパラメータをクリア
+  history.replaceState({},'',window.location.pathname);
+  // 決済前に保存した診断状態を復元
+  const raw=localStorage.getItem('gd_pending');
+  if(!raw) return;
+  const saved=JSON.parse(raw);
+  S.sunIdx=saved.sunIdx; S.moonIdx=saved.moonIdx; S.answers=saved.answers;
+  localStorage.removeItem('gd_pending');
+  // プレミアム解除フラグを保存（このスター座の診断に紐づける）
+  sessionStorage.setItem('gd_premium','true');
+  localStorage.setItem('gd_premium_session',String(S.sunIdx));
+  // 結果を復元表示
+  renderResult();
+  go('result');
+}
+
+/* ══════════════════════════════════════
+   3ヶ月リマインダー
+══════════════════════════════════════ */
+function checkReminder(){
+  const raw=localStorage.getItem('gd_last_diag');
+  if(!raw) return;
+  const last=JSON.parse(raw);
+  const diffDays=Math.floor((Date.now()-new Date(last.date))/(1000*60*60*24));
+  if(diffDays<90) return;
+  // バナー非表示後7日以内は再表示しない
+  const dis=localStorage.getItem('gd_banner_dismissed');
+  if(dis && (Date.now()-new Date(dis))<7*24*60*60*1000) return;
+  const body=document.getElementById('remind-banner-body');
+  body.textContent=`前回の診断から ${diffDays} 日が経ちました。あなたの女神「${last.goddess}（${last.sign}）」の魂は、次の段階へ歩みを進めているかもしれません。新しい光の道を確かめましょう。`;
+  document.getElementById('remind-banner').classList.add('show');
+}
+function closeBanner(){
+  document.getElementById('remind-banner').classList.remove('show');
+  localStorage.setItem('gd_banner_dismissed',new Date().toISOString());
+}
+function retakeFromBanner(){
+  closeBanner();
+  document.getElementById('f-date').value='';
+  document.getElementById('f-time').value='12:00';
+  document.getElementById('zodiac-preview').classList.remove('visible');
+  go('birth');
+}
+function getNextDiagDate(){
+  const raw=localStorage.getItem('gd_last_diag');
+  const base=raw?new Date(JSON.parse(raw).date):new Date();
+  const d=new Date(base);
+  d.setMonth(d.getMonth()+3);
+  return d;
+}
+function showCalCard(){
+  const next=getNextDiagDate();
+  document.getElementById('cal-next-date').textContent=
+    next.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('cal-card').style.display='block';
+}
+function addGoogleCal(){
+  const sun=GODDESSES[S.sunIdx];
+  const next=getNextDiagDate();
+  const end=new Date(next); end.setDate(end.getDate()+1);
+  const fmt=d=>d.toISOString().replace(/[-:.]/g,'').slice(0,8);
+  const title=encodeURIComponent(`女神診断 再診断 ─ ${sun.goddess}から3ヶ月`);
+  const detail=encodeURIComponent(`前回の女神「${sun.goddess}（${sun.sign}）」から3ヶ月。あなたの魂の進化を確かめましょう。`);
+  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(next)}/${fmt(end)}&details=${detail}`,'_blank');
+}
+function dlICS(){
+  const sun=GODDESSES[S.sunIdx];
+  const next=getNextDiagDate();
+  const end=new Date(next); end.setDate(end.getDate()+1);
+  const fmt=d=>d.toISOString().replace(/[-:.]/g,'').slice(0,8);
+  const ics=[
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//女神診断//JP',
+    'BEGIN:VEVENT',
+    `UID:goddess-${Date.now()}@diagnosis`,
+    `DTSTART;VALUE=DATE:${fmt(next)}`,
+    `DTEND;VALUE=DATE:${fmt(end)}`,
+    `SUMMARY:女神診断 再診断 ─ ${sun.goddess}から3ヶ月`,
+    `DESCRIPTION:前回の女神「${sun.goddess}（${sun.sign}）」から3ヶ月。\\nあなたの魂の進化を確かめましょう。`,
+    'BEGIN:VALARM','TRIGGER:-P0D','ACTION:DISPLAY',
+    'DESCRIPTION:女神診断の再診断日です',
+    'END:VALARM','END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));
+  a.download='女神診断_再診断.ics';
+  a.click();
+}
+
+/* ══════════════════════════════════════
+   SHARE / PDF
+══════════════════════════════════════ */
+function shareX(){
+  const sun=GODDESSES[S.sunIdx], moon=GODDESSES[S.moonIdx];
+  const txt=`🌸 女神診断の結果\n\n☀ 太陽女神：${sun.goddess}（${sun.sign}）\n魂の進化サイクル：第${sun.cyclePos}番目 フェーズ${sun.phase}\nテーマ：${sun.theme}\n\n☽ 月女神：${moon.goddess}（${moon.sign}）\n言霊：「${moon.kotodama}」\n\n#女神診断 #日本神話 #魂の進化`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
+}
+// 有料版PDF（女神からの手紙・課題・ワーク含む）
+function dlPremiumPDF(){ dlPDF(true); }
+// 無料版PDF（通常診断結果のみ）
+function dlFreePDF(){ dlPDF(false); }
+function dlPDF(isPremium=false){
+  const sun=GODDESSES[S.sunIdx], moon=GODDESSES[S.moonIdx];
+  const pd=PREMIUM_DATA[S.sunIdx];
+  const total=S.answers.reduce((a,b)=>a+b,0);
+  const sl=scoreLevel(total);
+  const nextG=GODDESSES[sun.nextIdx];
+  const darkG=GODDESSES[sun.darkIdx];
+  const phase=PHASES[sun.phase-1];
+  const sunSame=(S.sunIdx===S.moonIdx);
+  const isLastCycle=(sun.cyclePos===12);
+  const cycleNote=isLastCycle?' ─ 新たな螺旋へ':'';
+  const now=new Date().toLocaleDateString('ja-JP');
+
+  const moonMythBlock=sunSame?'':`
+    <div style="margin-top:12px;border-top:1px dashed #c8a040;">
+      <div style="font-size:10px;color:#9a6a20;letter-spacing:0.2em;margin:12px 0 4px;">☽ ${moon.goddess} の神話</div>
+      <div style="font-size:10px;color:#9a7030;letter-spacing:0.2em;margin-bottom:8px;">${moon.mythSource}</div>
+      <div style="font-size:13px;color:#3a3020;line-height:1.9;">${moon.myth}</div>
+      <div style="font-size:11px;color:#9a6a20;margin-top:10px;margin-bottom:4px;">コンセプトとの接点</div>
+      <div style="font-size:13px;color:#4a4030;line-height:1.8;font-style:italic;">${moon.mythConnect}</div>
+    </div>`;
+
+  const html=`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+<title>女神診断結果 ─ ${sun.goddess}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans JP',sans-serif;background:#faf8f2;color:#2a2010;max-width:720px;margin:0 auto;padding:24px 28px 60px;}
+h1{font-family:'Zen Old Mincho',serif;font-size:32px;color:#7a4800;text-align:center;letter-spacing:0.15em;margin-bottom:4px;}
+.sub{text-align:center;font-size:13px;color:#9a6a20;letter-spacing:0.3em;margin-bottom:2px;}
+.glyph{font-size:48px;text-align:center;margin:12px 0 8px;color:#7a4800;}
+.theme{text-align:center;font-size:14px;color:#7a5520;letter-spacing:0.2em;margin-bottom:6px;}
+.message{text-align:center;font-size:13px;color:#4a3820;font-style:italic;line-height:1.8;margin-bottom:20px;padding:12px 20px;background:#fff8f0;border-left:3px solid #c8a040;}
+.section{border:1px solid #c8b060;background:#fffdf5;padding:18px 20px;margin-bottom:14px;break-inside:avoid;page-break-inside:avoid;}
+.sec-title{font-family:'Zen Old Mincho',serif;font-size:13px;color:#7a4800;letter-spacing:0.2em;border-bottom:1px solid #e0c880;padding-bottom:8px;margin-bottom:12px;}
+.two-col{display:flex;gap:12px;break-inside:avoid;page-break-inside:avoid;}
+.col{flex:1;background:#fff;border:1px solid #d4c080;padding:12px 14px;}
+.col-lbl{font-size:10px;color:#9a6a20;letter-spacing:0.3em;margin-bottom:4px;}
+.col-name{font-family:'Zen Old Mincho',serif;font-size:18px;color:#7a4800;}
+.col-sub{font-size:11px;color:#7a6040;margin-top:3px;}
+.phase-bar{display:flex;gap:6px;break-inside:avoid;}
+.phase-item{flex:1;padding:8px 6px;background:#f5f0e8;border:1px solid #d4c080;text-align:center;}
+.phase-item.active{background:#fff3d0;border-color:#c8a040;}
+.phase-num{font-size:9px;color:#9a6a20;letter-spacing:0.2em;}
+.phase-name{font-size:11px;color:#7a4800;font-weight:700;margin-top:2px;}
+.phase-sub{font-size:9px;color:#7a6040;margin-top:1px;}
+.evo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.evo-row{display:flex;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px solid #e8e0c8;}
+.evo-lbl{font-size:10px;color:#9a6a20;white-space:nowrap;min-width:90px;}
+.evo-val{font-size:13px;color:#3a3020;}
+.tier{text-align:center;padding:8px;background:#fff3d0;border:1px solid #c8a040;margin-bottom:10px;font-family:'Zen Old Mincho',serif;font-size:14px;color:#7a4800;}
+.tier-desc{font-size:12px;color:#4a3820;line-height:1.7;text-align:center;margin-bottom:10px;}
+.path-box{flex:1;padding:14px;border:1px solid #d4c080;}
+.path-light{background:#f0faf5;}
+.path-dark{background:#fff5f5;}
+.path-dir{font-size:10px;letter-spacing:0.2em;margin-bottom:6px;font-weight:700;}
+.path-light .path-dir{color:#1a6040;}
+.path-dark .path-dir{color:#7a1828;}
+.path-goddess{font-family:'Zen Old Mincho',serif;font-size:18px;margin:4px 0;}
+.path-light .path-goddess{color:#1a5030;}
+.path-dark .path-goddess{color:#7a1828;}
+.path-theme{font-size:10px;color:#6a7060;margin-bottom:6px;}
+.path-desc{font-size:12px;color:#3a3020;line-height:1.7;margin-bottom:6px;}
+.path-advice{font-size:11px;font-style:italic;}
+.path-light .path-advice{color:#1a6040;}
+.path-dark .path-advice{color:#7a1828;}
+.ennea-badge{display:inline-block;font-size:11px;color:#7a4800;border:1px solid #c8a040;padding:3px 12px;background:#fff8f0;letter-spacing:0.15em;margin-bottom:10px;}
+.kotodama{text-align:center;font-family:'Zen Old Mincho',serif;font-size:22px;color:#7a4800;letter-spacing:0.3em;padding:16px;background:#fffdf5;border:1px solid #c8a040;margin-bottom:14px;break-inside:avoid;}
+.prem-lbl{font-size:11px;color:#9a6a20;letter-spacing:0.2em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #e8d890;}
+.prem-txt{font-size:13px;color:#3a3020;line-height:1.85;margin-bottom:14px;}
+.compat-row{display:flex;gap:10px;margin-top:6px;}
+.compat-box{flex:1;padding:10px 12px;border:1px solid;}
+.compat-good{background:#f0faf5;border-color:#80c0a0;}
+.compat-bad{background:#fff5f5;border-color:#e0a0a0;}
+.compat-type{font-size:10px;letter-spacing:0.15em;margin-bottom:4px;}
+.compat-good .compat-type{color:#1a6040;}
+.compat-bad .compat-type{color:#7a1828;}
+.compat-names{font-family:'Zen Old Mincho',serif;font-size:14px;color:#3a3020;}
+.shadow-box{background:#fff5f5;border:1px solid #e0b0b0;padding:14px 16px;margin-bottom:14px;break-inside:avoid;}
+.shadow-lbl{font-size:10px;color:#9a4040;letter-spacing:0.2em;margin-bottom:6px;}
+.shadow-name{font-family:'Zen Old Mincho',serif;font-size:18px;color:#7a1828;margin-bottom:4px;}
+.shadow-row{display:flex;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid #f0d0d0;}
+.shadow-k{font-size:10px;color:#9a5050;min-width:80px;}
+.shadow-v{font-size:13px;color:#3a2020;}
+.myth-source{font-size:10px;color:#9a6a20;letter-spacing:0.2em;margin-bottom:4px;}
+.myth-story{font-size:13px;color:#3a3020;line-height:1.9;margin-bottom:8px;}
+.myth-cl{font-size:11px;color:#9a6a20;margin-bottom:4px;}
+.myth-cv{font-size:13px;color:#4a4030;line-height:1.8;font-style:italic;}
+.footer{text-align:center;font-size:10px;color:#9a8060;letter-spacing:0.3em;margin-top:30px;padding-top:12px;border-top:1px solid #e0c880;}
+@media print{
+  body{padding:10px 16px;}
+  .section,.two-col,.path-box,.compat-row,.kotodama,.shadow-box{break-inside:avoid;page-break-inside:avoid;}
+  .premium-section{break-before:page;page-break-before:always;}
+  button{display:none!important;}
+}
+</style></head><body>
+<div style="text-align:center;margin-bottom:6px;"><span style="font-size:11px;color:#9a6a20;letter-spacing:0.4em;">GODDESS DIAGNOSIS</span></div>
+<div class="glyph">${sun.glyph}</div>
+<div class="sub">${sun.sign} · ${sun.en}</div>
+<h1>${sun.goddess}</h1>
+<div class="theme">${sun.theme}</div>
+<div class="message">${sun.message}</div>
+
+<!-- 太陽・月 -->
+<div class="section">
+  <div class="sec-title">☀ 太陽女神 ／ ☽ 月女神</div>
+  <div class="two-col">
+    <div class="col">
+      <div class="col-lbl">☀ 太陽女神</div>
+      <div class="col-name">${sun.goddess}</div>
+      <div class="col-sub">${sun.sign} — ${sun.theme}</div>
+    </div>
+    <div class="col" style="${sunSame?'opacity:0.4;':''}">
+      <div class="col-lbl">☽ 月女神</div>
+      <div class="col-name">${moon.goddess}</div>
+      <div class="col-sub">${moon.sign} — ${moon.theme}</div>
+    </div>
+  </div>
+</div>
+
+<!-- フェーズ -->
+<div class="section">
+  <div class="sec-title">魂の進化サイクル ─ 第 ${sun.cyclePos} 番目 · フェーズ ${sun.phase}</div>
+  <div class="tier">${sl.label}</div>
+  <div class="tier-desc">${sl.desc}</div>
+  <div class="phase-bar">
+    ${PHASES.map(p=>`<div class="phase-item${sun.phase===p.no?' active':''}"><div class="phase-num">Phase ${p.no}</div><div class="phase-name">${p.title}</div><div class="phase-sub">${p.sub}</div></div>`).join('')}
+  </div>
+  <div style="margin-top:12px;">
+    <div class="evo-row"><span class="evo-lbl">闇のテーマ</span><span class="evo-val">${sun.shadow}</span></div>
+    <div class="evo-row"><span class="evo-lbl">覚醒のテーマ</span><span class="evo-val">${sun.awakening}</span></div>
+  </div>
+</div>
+
+<!-- 光の道・闇の道 -->
+<div class="section">
+  <div class="sec-title">進化の方向 ─ エニアグラム的視点</div>
+  <div style="margin-bottom:10px;"><span class="ennea-badge">${sun.enneagram}</span></div>
+  <div class="two-col">
+    <div class="path-box path-light">
+      <div class="path-dir">☀ 光の道（進化・統合）</div>
+      <div style="font-size:10px;color:#4a8060;margin-bottom:4px;">成長するとき →</div>
+      <div class="path-goddess">${nextG.goddess}</div>
+      <div class="path-theme">${nextG.sign} · ${nextG.theme}${cycleNote}</div>
+      <div class="path-desc">${sun.evolutionAdvice}</div>
+      <div class="path-advice">✦ ${sun.lightKey}</div>
+    </div>
+    <div class="path-box path-dark">
+      <div class="path-dir">🌑 闇の道（退行・分裂）</div>
+      <div style="font-size:10px;color:#9a4040;margin-bottom:4px;">ストレスを抱えるとき →</div>
+      <div class="path-goddess">${darkG.goddess}</div>
+      <div class="path-theme">${darkG.sign} · ${darkG.theme}の闇</div>
+      <div class="path-desc">${sun.darkState}</div>
+      <div class="path-advice">↩ ${sun.darkAdvice}</div>
+    </div>
+  </div>
+</div>
+
+<!-- 月の影 -->
+<div class="shadow-box">
+  <div class="shadow-lbl">☽ 月の影 ─ あなたの無意識</div>
+  <div class="shadow-name">${moon.goddess}</div>
+  <div class="col-sub" style="color:#7a5050;margin-bottom:10px;">${moon.theme}</div>
+  <div class="shadow-row"><span class="shadow-k">内なる緊張</span><span class="shadow-v">${moon.tension}</span></div>
+  <div class="shadow-row"><span class="shadow-k">根底にある恐れ</span><span class="shadow-v">${moon.fear}</span></div>
+  <div class="shadow-row"><span class="shadow-k">防衛の仕方</span><span class="shadow-v">${moon.guard}</span></div>
+</div>
+
+<!-- 言霊 -->
+<div class="kotodama">「${moon.kotodama}」</div>
+
+<!-- 神話 -->
+<div class="section">
+  <div class="sec-title">☀ ${sun.goddess} の神話</div>
+  <div class="myth-source">${sun.mythSource}</div>
+  <div class="myth-story">${sun.myth}</div>
+  <div class="myth-cl">コンセプトとの接点</div>
+  <div class="myth-cv">${sun.mythConnect}</div>
+  ${moonMythBlock}
+</div>
+
+<!-- プレミアムレポート -->
+<div class="section premium-section">
+  <div class="sec-title">詳細プロフィール</div>
+  <div class="prem-lbl">本質的な性格</div>
+  <div class="prem-txt">${sun.personality}</div>
+  <div class="prem-lbl">恋愛の癖</div>
+  <div class="prem-txt">${sun.love}</div>
+  <div class="prem-lbl">人生でハマる落とし穴</div>
+  <div class="prem-txt">${sun.pitfall}</div>
+  <div class="prem-lbl">本来の強み</div>
+  <div class="prem-txt">${sun.strengths}</div>
+  <div class="prem-lbl">相性</div>
+  <div class="compat-row">
+    <div class="compat-box compat-good"><div class="compat-type">◎ 相性の良いタイプ</div><div class="compat-names">${sun.compatible}</div></div>
+    <div class="compat-box compat-bad"><div class="compat-type">▲ 注意が必要なタイプ</div><div class="compat-names">${sun.avoid}</div></div>
+  </div>
+</div>
+
+${isPremium ? `
+<!-- 女神からの手紙（有料コンテンツ） -->
+<div class="section premium-section" style="break-before:page;page-break-before:always;">
+  <div class="sec-title" style="font-size:15px;letter-spacing:0.25em;">✦ ${sun.goddess} からの手紙</div>
+  <div style="font-family:'Noto Sans JP',sans-serif;font-size:14px;color:#2a2010;line-height:2.1;white-space:pre-line;padding:8px 4px;">${pd.letter}</div>
+</div>
+<div class="section" style="break-inside:avoid;page-break-inside:avoid;">
+  <div class="sec-title">☽ 今後3ヶ月の魂の課題</div>
+  ${pd.works.map((w,i)=>`
+  <div style="display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid #e8e0c8;">
+    <div style="min-width:24px;height:24px;border-radius:50%;background:#7a4800;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:serif;">${i+1}</div>
+    <div style="font-size:13px;color:#3a3020;line-height:1.8;">${w}</div>
+  </div>`).join('')}
+</div>
+<div class="section" style="break-inside:avoid;page-break-inside:avoid;background:#fffdf0;border-color:#c8a040;">
+  <div class="sec-title">✧ 覚醒のワーク</div>
+  <div style="font-size:13px;color:#3a2a10;line-height:2;font-style:italic;padding:4px 8px;border-left:3px solid #c8a040;">${pd.ritual}</div>
+</div>` : ''}
+
+<div class="footer">— 女神診断 · 魂の進化サイクル · ${now} —</div>
+<script>window.onload=function(){window.print();}<\/script>
+</body></html>`;
+
+  const w=window.open('','_blank','width=800,height=900,scrollbars=yes');
+  if(!w){
+    alert('ポップアップがブロックされています。ブラウザのポップアップ許可設定を確認してください。');
+    return;
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+}
+function dlPDF_html2pdf_unused(){
+  const sun=GODDESSES[S.sunIdx], moon=GODDESSES[S.moonIdx];
+  const nextG=GODDESSES[sun.nextIdx], darkG=GODDESSES[sun.darkIdx];
+  const total=S.answers.reduce((a,b)=>a+b,0);
+  const sl=scoreLevel(total);
+  const phase=PHASES[sun.phase-1];
+  const sunSame=(S.sunIdx===S.moonIdx);
+
+  // PDF専用の白背景レイアウトを生成（CSS変数を使わず全てinline style）
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;left:-9999px;top:0;width:680px;background:#faf8f4;font-family:"Noto Sans JP",sans-serif;color:#2a2018;padding:0;box-sizing:border-box;';
+
+  const s={
+    header:'background:#1a1520;color:#e8c97a;text-align:center;padding:36px 40px 28px;',
+    enLabel:'font-size:11px;letter-spacing:0.4em;color:#a89060;margin-bottom:12px;',
+    glyph:'font-size:52px;margin-bottom:10px;',
+    signLabel:'font-size:11px;letter-spacing:0.35em;color:#a89060;margin-bottom:6px;',
+    heroName:'font-size:38px;font-weight:900;color:#e8c97a;letter-spacing:0.12em;margin-bottom:6px;',
+    heroTheme:'font-size:16px;color:#c4a050;letter-spacing:0.2em;margin-bottom:12px;',
+    heroMsg:'font-size:13px;color:#c8b890;line-height:1.9;',
+    body:'padding:28px 36px;',
+    sec:'margin-bottom:22px;border:1px solid #d4c090;border-top:2px solid #c4a050;padding:18px 20px;background:#fff;',
+    secTitle:'font-size:10px;letter-spacing:0.35em;color:#8b6a20;margin-bottom:10px;',
+    secText:'font-size:13px;color:#3a3020;line-height:2;',
+    twoCol:'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;',
+    box:'border:1px solid #d4c090;padding:16px;text-align:center;background:#fff;',
+    boxLbl:'font-size:10px;letter-spacing:0.3em;color:#8b6a20;margin-bottom:8px;',
+    boxVal:'font-size:18px;font-weight:700;color:#8b5a00;',
+    boxSub:'font-size:11px;color:#8a8070;margin-top:4px;',
+    pathGrid:'display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #d4c090;margin-bottom:22px;',
+    pathLight:'padding:18px;border-right:1px solid #d4c090;background:#f5fcf8;',
+    pathDark:'padding:18px;background:#fdf5f5;',
+    pathDir:'font-size:10px;letter-spacing:0.3em;margin-bottom:8px;',
+    pathGName:'font-size:20px;font-weight:700;margin-bottom:4px;',
+    pathTheme:'font-size:11px;margin-bottom:8px;',
+    pathDesc:'font-size:12px;line-height:1.9;color:#555;border-left:2px solid;padding-left:10px;',
+    pathAdvice:'font-size:11px;font-style:italic;margin-top:8px;',
+    kotodama:'text-align:center;padding:24px;border:1px solid #c4a050;background:#fffdf5;margin-bottom:22px;',
+    kotodamaText:'font-size:17px;font-weight:700;color:#8b5a00;line-height:1.9;',
+    shadowSec:'border:1px solid #d4c090;border-left:3px solid #8b3040;padding:18px 20px;background:#fdf8f8;margin-bottom:22px;',
+    footer:'text-align:center;padding:20px;font-size:11px;color:#a89060;letter-spacing:0.3em;border-top:1px solid #d4c090;',
+  };
+
+  wrap.innerHTML=`
+<div style="${s.header}">
+  <div style="${s.enLabel}">Twelve Goddess · Soul Evolution Cycle</div>
+  <div style="${s.glyph}">${sun.glyph}</div>
+  <div style="${s.signLabel}">${sun.sign} · ${sun.en}</div>
+  <div style="${s.heroName}">${sun.goddess}</div>
+  <div style="${s.heroTheme}">${sun.theme}</div>
+  <div style="${s.heroMsg}">${sun.message}</div>
+</div>
+<div style="${s.body}">
+
+  <div style="${s.twoCol}">
+    <div style="${s.box}">
+      <div style="${s.boxLbl}">☀ 太陽女神（本質）</div>
+      <div style="${s.boxVal}">${sun.goddess}</div>
+      <div style="${s.boxSub}">${sun.sign} — ${sun.theme}</div>
+    </div>
+    <div style="${s.box}">
+      <div style="${s.boxLbl}">☽ 月女神（影）</div>
+      <div style="${s.boxVal}">${moon.goddess}</div>
+      <div style="${s.boxSub}">${moon.sign} — ${moon.theme}</div>
+    </div>
+  </div>
+
+  <div style="${s.sec}">
+    <div style="${s.secTitle}">魂の進化サイクル — 現在地</div>
+    <div style="${s.secText}">第 ${sun.cyclePos} 番目の女神　フェーズ${sun.phase}：${phase.title} / ${phase.sub}<br>
+    <strong style="color:#8b5a00">${sl.label}</strong> — ${sl.desc}</div>
+  </div>
+
+  <div style="${s.sec}">
+    <div style="${s.secTitle}">本質的な性格</div>
+    <div style="${s.secText}">${sun.personality}</div>
+  </div>
+
+  <div style="${s.sec}">
+    <div style="${s.secTitle}">恋愛の癖</div>
+    <div style="${s.secText}">${sun.love}</div>
+  </div>
+
+  <div style="${s.sec}">
+    <div style="${s.secTitle}">人生でハマる落とし穴</div>
+    <div style="${s.secText}">${sun.pitfall}</div>
+  </div>
+
+  <div style="${s.sec}">
+    <div style="${s.secTitle}">本来の強み</div>
+    <div style="${s.secText}">${sun.strengths}</div>
+  </div>
+
+  <div style="${s.twoCol}">
+    <div style="${s.box}">
+      <div style="${s.boxLbl}">◎ 相性の良いタイプ</div>
+      <div style="font-size:12px;color:#3a8060;line-height:1.9;text-align:left;">${sun.compatible.replace(' / ','<br>')}</div>
+    </div>
+    <div style="${s.box}">
+      <div style="${s.boxLbl}">▲ 注意が必要なタイプ</div>
+      <div style="font-size:12px;color:#8b3040;line-height:1.9;text-align:left;">${sun.avoid.replace(' / ','<br>')}</div>
+    </div>
+  </div>
+
+  <div style="${s.pathGrid}">
+    <div style="${s.pathLight}">
+      <div style="${s.pathDir};color:#3a8060">☀ 光の道（進化・統合）</div>
+      <div style="font-size:11px;color:#3a8060;margin-bottom:4px;">成長するとき →</div>
+      <div style="${s.pathGName};color:#1a6040">${nextG.goddess}</div>
+      <div style="${s.pathTheme};color:#3a8060">${nextG.sign} · ${nextG.theme}</div>
+      <div style="${s.pathDesc};border-left-color:#3a8060;">${sun.evolutionAdvice}</div>
+    </div>
+    <div style="${s.pathDark}">
+      <div style="${s.pathDir};color:#8b3040">🌑 闇の道（退行・分裂）</div>
+      <div style="font-size:11px;color:#8b3040;margin-bottom:4px;">ストレスを抱えるとき →</div>
+      <div style="${s.pathGName};color:#8b3040">${darkG.goddess}</div>
+      <div style="${s.pathTheme};color:#8b3040">${darkG.sign} · ${darkG.theme}の闇</div>
+      <div style="${s.pathDesc};border-left-color:#8b3040;">${sun.darkSlip}</div>
+      <div style="${s.pathAdvice};color:#8b3040;">↩ ${sun.darkAdvice}</div>
+    </div>
+  </div>
+
+  <div style="${s.shadowSec}">
+    <div style="font-size:10px;letter-spacing:0.3em;color:#8b3040;margin-bottom:10px;">☽ 月の女神 — 影のテーマ</div>
+    <div style="font-size:20px;font-weight:700;color:#8b3040;margin-bottom:6px;">${moon.goddess}</div>
+    <div style="font-size:13px;color:#555;margin-bottom:10px;">テーマ：${moon.theme}</div>
+    <div style="font-size:12px;color:#555;line-height:1.8;">
+      緊張すると… ${moon.tension}<br>
+      内側の恐れ… ${moon.fear}<br>
+      守っているもの… ${moon.guard}
+    </div>
+  </div>
+
+  <div style="${s.kotodama}">
+    <div style="font-size:10px;letter-spacing:0.4em;color:#8b6a20;margin-bottom:10px;">言霊</div>
+    <div style="${s.kotodamaText}">「${moon.kotodama}」</div>
+  </div>
+
+  <div style="${s.sec}">
+    <div style="${s.secTitle}">神話との接点 — ${sun.goddess}</div>
+    <div style="font-size:11px;color:#a89060;margin-bottom:8px;font-style:italic;">${sun.mythSource}</div>
+    <div style="${s.secText}">${sun.myth}</div>
+  </div>
+
+</div>
+<div style="${s.footer}">— 女神診断 · 魂の進化サイクル · ${new Date().toLocaleDateString('ja-JP')} —</div>`;
+
+  document.body.appendChild(wrap);
+  html2pdf().set({
+    margin:0, filename:'女神診断結果.pdf',
+    image:{type:'jpeg',quality:0.97},
+    html2canvas:{scale:2, backgroundColor:'#faf8f4', useCORS:true, logging:false},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+  }).from(wrap).save().then(()=>{
+    document.body.removeChild(wrap);
+  });
+}
+function retake(){
+  S={sunIdx:-1,moonIdx:-1,answers:[]};
+  document.getElementById('f-date').value='';
+  document.getElementById('f-time').value='12:00';
+  document.getElementById('zodiac-preview').classList.remove('visible');
+  go('top');
+  loadHist();
+}
+
+/* ══════════════════════════════════════
+   CANVAS STARFIELD
+══════════════════════════════════════ */
+(function(){
+  const cv=document.getElementById('bg-canvas');
+  const ctx=cv.getContext('2d');
+  let W,H,stars=[];
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+  function initStars(){
+    stars=[];
+    for(let i=0;i<120;i++){
+      stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.2,a:Math.random(),sp:Math.random()*0.004+0.001,gold:Math.random()<0.15});
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.a+=s.sp; if(s.a>1) s.a=0;
+      const alpha=Math.abs(Math.sin(s.a*Math.PI));
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.gold?`rgba(196,160,80,${alpha*0.8})`:`rgba(200,210,220,${alpha*0.5})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{resize();initStars();});
+  resize(); initStars(); draw();
+})();
+
+window.onload=()=>{checkPaymentReturn();loadHist();checkReminder();go('top');};
+</script>
+</body>
+</html>
