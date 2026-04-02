@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>女神診断 ─ 魂の進化サイクル</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #08070f;
+  --surface: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.08);
+  --border-gold: rgba(196,160,80,0.3);
+  --gold: #c4a050;
+  --gold-bright: #e8c97a;
+  --gold-dim: #6b5520;
+  --silver: #a8b8c8;
+  --text: #e8e0d4;
+  --text-dim: #8090a0;
+  --crimson: #6b1a28;
+  --phase1: rgba(196,160,80,0.7);
+  --phase2: rgba(100,190,160,0.7);
+  --phase3: rgba(220,140,80,0.7);
+  --phase4: rgba(170,110,200,0.7);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+/* HEADER */
+.site-header {
+  text-align: center;
+  padding: 80px 0 60px;
+}
+
+.site-header .en {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.5em;
+  color: var(--gold-dim);
+  margin-bottom: 20px;
+  display: block;
+}
+
+.site-header h1 {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  line-height: 1.2;
+  text-shadow: 0 0 60px rgba(196,160,80,0.3);
+}
+
+.site-header .tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  color: var(--silver);
+  margin-top: 16px;
+  letter-spacing: 0.2em;
+}
+
+.header-line {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
+  margin: 30px auto 0;
+}
+
+/* PANEL */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--border-gold);
+  padding: 36px 32px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+@media (max-width: 480px) {
+  .panel { padding: 24px 20px; }
+}
+
+.panel-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 16px;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.step-no {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--bg);
+  background: var(--gold-dim);
+  padding: 3px 12px;
+}
+
+/* FORM */
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.field input, .field select {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-gold);
+  color: var(--text);
+  padding: 12px 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  outline: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+  transition: border-color 0.3s;
+}
+
+.field input:focus, .field select:focus {
+  border-color: var(--gold-dim);
+  background: rgba(196,160,80,0.04);
+}
+
+.field select option {
+  background: #1a1520;
+}
+
+.field-note {
+  font-size: 11px;
+  color: var(--gold-dim);
+  margin-top: 6px;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+}
+
+/* BUTTON */
+.btn {
+  background: var(--gold-dim);
+  color: var(--text);
+  border: 1px solid var(--border-gold);
+  padding: 14px 32px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn:hover {
+  background: var(--gold);
+  color: var(--bg);
+  box-shadow: 0 0 20px rgba(196,160,80,0.4);
+}
+
+.btn-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.btn-row .btn {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* RESULT CARD */
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--gold);
+  padding: 32px;
+  margin-bottom: 24px;
+  page-break-inside: avoid;
+}
+
+@media (max-width: 480px) {
+  .result-card { padding: 20px; }
+}
+
+.result-card .goddess-name {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(24px, 5vw, 36px);
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+.result-card .sign-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--text-dim);
+  letter-spacing: 0.3em;
+  margin-bottom: 20px;
+}
+
+.result-card .theme {
+  font-size: 13px;
+  color: var(--silver);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.result-card .whisper {
+  background: rgba(100,190,160,0.15);
+  border-left: 3px solid rgba(100,190,160,0.5);
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.8;
+  margin: 20px 0;
+  font-style: italic;
+}
+
+/* EVOLUTION PATH */
+.evolution-paths {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+@media (max-width: 480px) {
+  .evolution-paths { grid-template-columns: 1fr; }
+}
+
+.evolution-box {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  padding: 16px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.evolution-box.light {
+  border-left: 3px solid var(--phase2);
+}
+
+.evolution-box.dark {
+  border-left: 3px solid var(--crimson);
+}
+
+.evolution-box h4 {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.evolution-box.light h4 {
+  color: var(--phase2);
+}
+
+.evolution-box.dark h4 {
+  color: var(--crimson);
+}
+
+/* MYTH TAB */
+.myth-tab-row {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.myth-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 8px 16px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-bottom: 2px solid transparent;
+}
+
+.myth-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.myth-panel {
+  display: none;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  page-break-inside: avoid;
+}
+
+.myth-panel.active {
+  display: block;
+}
+
+/* PREMIUM CONTENT */
+.premium-section {
+  background: rgba(196,160,80,0.08);
+  border: 1px solid var(--border-gold);
+  padding: 24px;
+  margin: 24px 0;
+  page-break-inside: avoid;
+}
+
+.premium-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.premium-section h3 {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 16px;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+}
+
+.premium-section p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.work-item {
+  background: rgba(255,255,255,0.02);
+  border-left: 3px solid var(--gold-dim);
+  padding: 12px;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* STRIPE PANEL */
+.stripe-panel {
+  background: linear-gradient(135deg, rgba(196,160,80,0.1), rgba(100,190,160,0.05));
+  border: 1px solid var(--border-gold);
+  padding: 32px;
+  margin: 40px 0;
+  text-align: center;
+}
+
+.stripe-panel h3 {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 18px;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.stripe-panel p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.stripe-panel .price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: var(--gold-bright);
+  margin: 16px 0;
+  letter-spacing: 0.1em;
+}
+
+.btn-buy, .btn-dl-premium, .btn-dl-free {
+  background: var(--gold-dim);
+  color: var(--text);
+  border: 1px solid var(--border-gold);
+  padding: 14px 32px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-buy:hover, .btn-dl-premium:hover, .btn-dl-free:hover {
+  background: var(--gold);
+  color: var(--bg);
+  box-shadow: 0 0 20px rgba(196,160,80,0.4);
+}
+
+/* REMINDER BANNER */
+.remind-banner {
+  background: rgba(220,140,80,0.15);
+  border: 1px solid rgba(220,140,80,0.5);
+  border-left: 3px solid var(--phase3);
+  padding: 16px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.remind-banner strong {
+  color: var(--phase3);
+}
+
+/* CALENDAR CARD */
+.cal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin: 16px 0;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.cal-card button {
+  background: var(--gold-dim);
+  color: var(--text);
+  border: 1px solid var(--border-gold);
+  padding: 8px 16px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s;
+}
+
+.cal-card button:hover {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+/* SCREEN SECTIONS */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* PRINT STYLES */
+@media print {
+  body, .wrap { background: white; color: #333; }
+  #bg-canvas { display: none; }
+  .site-header { padding: 40px 0 30px; page-break-after: avoid; }
+  .site-header h1 { color: #333; text-shadow: none; }
+  .site-header .en, .site-header .tagline { color: #666; }
+  .panel, .result-card { background: white; border: 1px solid #ddd; border-top: 1px solid #ddd; color: #333; }
+  .panel-title, .result-card .goddess-name { color: #333; }
+  .text-dim, .field-note, .result-card .sign-name, .result-card .theme, .myth-panel { color: #666; }
+  .whisper { background: #f5f5f5; border-left: 3px solid #999; color: #666; }
+  .evolution-box { background: white; border: 1px solid #ddd; color: #333; }
+  .evolution-box.light, .evolution-box.dark { border-left: 3px solid #999; }
+  .evolution-box h4 { color: #333; }
+  .myth-tab { color: #666; }
+  .myth-tab.active { color: #333; border-bottom-color: #333; }
+  .myth-tab-row { border-bottom: 1px solid #ddd; }
+  .premium-section { background: #f9f9f9; border: 1px solid #ddd; color: #333; }
+  .premium-label, .premium-section h3 { color: #333; }
+  .premium-section p, .work-item { color: #666; }
+  .work-item { background: white; border-left: 3px solid #999; }
+  .stripe-panel, .remind-banner, .cal-card, .btn-row { display: none !important; }
+  .result-card { margin-bottom: 20px; page-break-inside: avoid; }
+  .myth-tab-row { display: none; }
+  .myth-panel { display: block !important; }
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+  <!-- HEADER -->
+  <div class="site-header">
+    <span class="en">Goddess Diagnosis</span>
+    <h1>女神診断</h1>
+    <div class="tagline">── 魂の進化サイクル ──</div>
+    <div class="header-line"></div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="home" class="screen active">
+    <div class="panel">
+      <div class="panel-title">
+        <span class="step-no">STEP 1</span>
+        <span>基本情報</span>
+      </div>
+      <div class="field">
+        <label>お名前</label>
+        <input id="nameInput" type="text" placeholder="例：太郎">
+      </div>
+      <div class="field">
+        <label>星座（太陽）</label>
+        <select id="sunSignSelect">
+          <option value="">選択してください</option>
+          <option value="0">牡羊座 Aries</option>
+          <option value="1">牡牛座 Taurus</option>
+          <option value="2">双子座 Gemini</option>
+          <option value="3">蟹座 Cancer</option>
+          <option value="4">獅子座 Leo</option>
+          <option value="5">乙女座 Virgo</option>
+          <option value="6">天秤座 Libra</option>
+          <option value="7">蠍座 Scorpio</option>
+          <option value="8">射手座 Sagittarius</option>
+          <option value="9">山羊座 Capricorn</option>
+          <option value="10">水瓶座 Aquarius</option>
+          <option value="11">魚座 Pisces</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>星座（月）</label>
+        <select id="moonSignSelect">
+          <option value="">選択してください</option>
+          <option value="0">牡羊座 Aries</option>
+          <option value="1">牡牛座 Taurus</option>
+          <option value="2">双子座 Gemini</option>
+          <option value="3">蟹座 Cancer</option>
+          <option value="4">獅子座 Leo</option>
+          <option value="5">乙女座 Virgo</option>
+          <option value="6">天秤座 Libra</option>
+          <option value="7">蠍座 Scorpio</option>
+          <option value="8">射手座 Sagittarius</option>
+          <option value="9">山羊座 Capricorn</option>
+          <option value="10">水瓶座 Aquarius</option>
+          <option value="11">魚座 Pisces</option>
+        </select>
+      </div>
+      <button class="btn" onclick="startDiagnosis()">診断を開始する</button>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="questions" class="screen">
+    <div class="panel">
+      <div class="panel-title">
+        <span class="step-no" id="questionProgress">Q 1/12</span>
+        <span>心理診断</span>
+      </div>
+      <div id="questionContent"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="prevQuestion()" id="prevBtn" style="display:none;">← 前へ</button>
+        <button class="btn" onclick="nextQuestion()" id="nextBtn">次へ →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result" class="screen">
+    <div id="resultContent"></div>
+    <div class="stripe-panel" id="stripePanel"></div>
+  </div>
+
+</div>
+
+<script>
+const STRIPE_URL = 'https://buy.stripe.com/9B6cN64xHfYUb2o4a0d3i00';
+
+const GODDESSES = [
+  {
+    sign: '牡羊座', en: 'Aries', goddess: '天照大御神', theme: '輝く太陽と矛盾', glyph: '♈',
+    color: '#FF6B35', hook: '「我」の欲望と「全体」への責任の間で揺れ動く', whisper: '強さは孤立ではなく、つながりの中で育つ',
+    personality: '情熱的で行動力がある。ただし、自分の意志を最優先にしすぎて周囲との摩擦が起きやすい。',
+    love: '心から相手を想っているが、時に独裁的になる。相手の自由も大切にすることが課題。',
+    pitfall: '自分が正しいと信じて疑わず、他者の異なる意見を認められない。',
+    strengths: 'リーダーシップ、決断力、情熱',
+    compatible: ['獅子座', '射手座', '天秤座'],
+    avoid: ['蟹座', '山羊座'],
+    cyclePos: 1, phase: '種蒔きの季節',
+    shadow: '支配欲と独善',
+    awakening: '自他の違いを認め、相手の光も尊重する',
+    nextIdx: 1,
+    enneagram: 8,
+    darkState: '自分の力で全てをコントロールしたい。相手の意思など無視して支配する。',
+    darkIdx: 7,
+    darkSlip: '支配欲',
+    darkAdvice: '相手の自由と主体性を尊重することで、本当の信頼が生まれる',
+    evolutionAdvice: '指導者から庭師へ。種を蒔き、相手の成長を見守る喜びを知る。',
+    mythSource: '日本神話',
+    myth: '天照大御神は高天原を統治する太陽神。ただし「皆の光になりたい」という思いから、岩戸隠れして全体を暗くしてしまう矛盾を抱える。',
+    mythConnect: '自分の輝きで何かを支配するのではなく、自分も世界も同じ光で輝いている関係性を求める。',
+    kotodama: '我が輝きは、全体の光と同じ',
+    message: '太陽は一つではなく、無数の光。あなたが輝くとき、周囲も輝く。',
+    lightKey: '包括的指導'
+  },
+  {
+    sign: '牡牛座', en: 'Taurus', goddess: 'アメノウズメ', theme: '変化への恐怖と創造', glyph: '♉',
+    color: '#2E8B57', hook: '「安定」を求めるあまり、自分を狭く小さく収めていないか',
+    whisper: '柔軟性は強さ。揺らぐことで、真の根っこが育つ',
+    personality: '堅実で信頼できるが、現状維持に執着しがち。新しい環境への適応が遅い傾向。',
+    love: '真摯で誠実だが、相手の変化を受け入れられず、同じ状態を求めすぎる。',
+    pitfall: '変化を恐れて、可能性を手放す。窮屈さの中で息が詰まる。',
+    strengths: '忍耐力、信頼性、献身性',
+    compatible: ['蟹座', '乙女座', '山羊座'],
+    avoid: ['獅子座', '水瓶座'],
+    cyclePos: 2, phase: '発芽の季節',
+    shadow: '執着と固執',
+    awakening: '安定の中に変化を受け入れる柔軟性を育む',
+    nextIdx: 2,
+    enneagram: 9,
+    darkState: '変わりたくない。今のままでいたい。相手も同じであるべき。',
+    darkIdx: 8,
+    darkSlip: '執着',
+    darkAdvice: '安定と成長のバランスを見つけることが、本当の幸せ。',
+    evolutionAdvice: '根を張りながら、新しい枝を伸ばす。どちらかではなく、両方。',
+    mythSource: '日本神話',
+    myth: 'アメノウズメは、岩戸隠れした天照大御神を誘い出すため、大胆に踊る。固い殻を破り、新しい世界を導く。',
+    mythConnect: '安定の中にいても、心は常に成長を求める。その柔軟性が奇跡を呼ぶ。',
+    kotodama: '動かぬもの、また動かずしては生きず',
+    message: 'あなたの根は深い。だからこそ、新しい枝を伸ばしても揺らがない。',
+    lightKey: '柔軟な安定'
+  },
+  {
+    sign: '双子座', en: 'Gemini', goddess: 'オモイカネ', theme: '思考の迷宮', glyph: '♊',
+    color: '#FFD700', hook: '頭で考えすぎて、心の声を見失っていないか',
+    whisper: '知恵は雑多な情報ではなく、本質への直感',
+    personality: '知的で多才だが、思考が多方向に散らばりやすい。決断に時間がかかる。',
+    love: '相手を理解したいという気持ちは強いが、言葉で説明しすぎて距離が生まれる。',
+    pitfall: '情報過多に陥り、本当に大切なものが見えなくなる。',
+    strengths: '好奇心、コミュニケーション能力、柔軟性',
+    compatible: ['獅子座', '天秤座', '水瓶座'],
+    avoid: ['蟹座', '魚座'],
+    cyclePos: 3, phase: '成長の季節',
+    shadow: '散漫と二面性',
+    awakening: '知識を統合し、一つの智慧に昇華させる',
+    nextIdx: 3,
+    enneagram: 5,
+    darkState: '複数の顔を持ち、本当の自分を隠す。相手に話すことも、相手が実は信用できない。',
+    darkIdx: 7,
+    darkSlip: '分散',
+    darkAdvice: '本当の自分を一つの顔に統合すること。その勇気から信頼が始まる。',
+    evolutionAdvice: '思考の翅から、知恵の根へ。多くを知ることより、深く理解することを。',
+    mythSource: '日本神話',
+    myth: 'オモイカネは「思う」神。天照大御神の岩戸隠れ時、知恵を絞って計画を立てる。思考の力で困難を解く。',
+    mythConnect: 'あなたの多様な思考は、本当の智慧へと導く羅針盤。迷宮から抜け出す鍵を持っている。',
+    kotodama: '思うこと、また知ること、光を見つむ',
+    message: '考えるのではなく、感じる。あなたの本質は、複雑な思考の先にある静寂にある。',
+    lightKey: '統合的思考'
+  },
+  {
+    sign: '蟹座', en: 'Cancer', goddess: 'クナド', theme: '心の殻と深い感受性', glyph: '♋',
+    color: '#FF69B4', hook: '自分を守ることが、相手も自分も傷つけていないか',
+    whisper: '感受性は弱さではなく、愛する力',
+    personality: '感受性豊かで共感能力が高いが、傷つきやすく自分の殻に籠もりやすい。',
+    love: '相手を深く思いやるが、期待と現実のズレに傷つき、相手を責めることがある。',
+    pitfall: '感情に支配され、相手に依存する。または完全に心を閉ざす。',
+    strengths: '同情心、直感力、保護本能',
+    compatible: ['牡牛座', '乙女座', '蠍座'],
+    avoid: ['双子座', '射手座'],
+    cyclePos: 4, phase: '開花の季節',
+    shadow: '依存と自己保護',
+    awakening: '感受性を強さに変え、他者を守る力に',
+    nextIdx: 4,
+    enneagram: 4,
+    darkState: '自分の感情だけが真実。相手の感情など知らない。被害者のように振舞い、相手に依存する。',
+    darkIdx: 1,
+    darkSlip: '感情的支配',
+    darkAdvice: '自分の感受性は宝。それを他者の成長のために使うことで、本当の力になる。',
+    evolutionAdvice: '内向きの愛から外向きの慈悲へ。自分の殻を越えて、世界に心を開く。',
+    mythSource: '日本神話',
+    myth: 'クナド（曲沢の神）は細い路を守る神。見えない道筋を知り、人々を導く。感受性で世界を読む。',
+    mythConnect: 'あなたの細い感覚は、他者が見落とす道を見つけられる。その力で、優しく導く。',
+    kotodama: '感じること、また道を開く',
+    message: 'あなたの心の殻の中には、世界を変える力がある。それを世界に解き放つ勇気をください。',
+    lightKey: '共感的力'
+  },
+  {
+    sign: '獅子座', en: 'Leo', goddess: 'アマテラス（獅子の時）', theme: '自己表現と承認欲求', glyph: '♌',
+    color: '#FF8C00', hook: '自分の光を見せたい気持ちが、相手を影に追いやっていないか',
+    whisper: '真の輝きは、自分だけの光ではなく、他者の光を映す鏡',
+    personality: '自信があり、表現力豊かだが、注目されないと不安になる。自意識が強い。',
+    love: '相手を愛しているが、自分がより愛されたいという欲求が先に来る傾向。',
+    pitfall: '自分の承認欲求のために、相手を自分の劇の脇役にしてしまう。',
+    strengths: 'カリスマ性、創造性、寛大さ',
+    compatible: ['牡羊座', '双子座', '天秤座'],
+    avoid: ['蠍座', '山羊座'],
+    cyclePos: 5, phase: '結実の季節',
+    shadow: '自己陶酔と虚栄',
+    awakening: '自分の光で相手も輝くように照らす喜びを知る',
+    nextIdx: 5,
+    enneagram: 3,
+    darkState: '自分が一番でないと気が済まない。相手の成功を心底から喜べない。',
+    darkIdx: 6,
+    darkSlip: '虚栄',
+    darkAdvice: '相手の成功が自分の喜びになるとき、本当の輝きが始まる。',
+    evolutionAdvice: 'スターから太陽へ。自分の光で、周囲全体を照らす責任を知る。',
+    mythSource: '日本神話',
+    myth: 'アマテラス（獅子の顔）は自分の光に誇りを持つ。しかし真の成熟は、その光で世界を守ることにある。',
+    mythConnect: 'あなたの輝きは本物。その輝きで、もっと多くの人を幸せにできる。',
+    kotodama: '我が光、世界を照らす',
+    message: 'あなたは十分に輝いている。今、その輝きで周囲を温めるときが来た。',
+    lightKey: '包容力ある輝き'
+  },
+  {
+    sign: '乙女座', en: 'Virgo', goddess: '瀬織津姫', theme: '完璧さへの執着と許し', glyph: '♍',
+    color: '#228B22', hook: '完璧を求めるあまり、自分も相手も許せていないか',
+    whisper: '完璧さは不要。必要なのは、本当らしさ',
+    personality: '分析的で几帳面だが、完璧さへの執着が強く、細かい欠点を見つけやすい。',
+    love: '相手に尽くすが、完璧さを要求し、相手にプレッシャーを与える。',
+    pitfall: '自分にも他者にも厳しすぎて、人間関係が窮屈になる。',
+    strengths: '実行力、誠実さ、分析力',
+    compatible: ['牡牛座', '蟹座', '蠍座'],
+    avoid: ['双子座', '射手座'],
+    cyclePos: 6, phase: '黄金期',
+    shadow: '批判と完璧主義',
+    awakening: '不完全さの中に美しさを見出す',
+    nextIdx: 6,
+    enneagram: 1,
+    darkState: '何もかも間違っている。自分も他者も不完全だから価値がない。',
+    darkIdx: 4,
+    darkSlip: '批判',
+    darkAdvice: 'あるがままの世界を受け入れること。そこに本当の秩序が見える。',
+    evolutionAdvice: '完璧さを追い求めることから、完全さを受け入れることへ。',
+    mythSource: '日本神話',
+    myth: '瀬織津姫は禊の神。汚れや穢れを水で流す。つまり、完璧さではなく、浄化と許しの神。',
+    mythConnect: 'あなたの厳しさは、実は自分たちを浄化したいという愛。その愛を許しに変えよう。',
+    kotodama: '清きもの、また許しなり',
+    message: 'あなたの完璧さへの目は、本当は自分たちへの深い愛。それを許しに変えたとき、本当の力が生まれる。',
+    lightKey: '慈悲的秩序'
+  },
+  {
+    sign: '天秤座', en: 'Libra', goddess: '天の岩戸', theme: '調和と自分の意見', glyph: '♎',
+    color: '#DDA0DD', hook: '皆の意見を聞くことで、自分の声を失っていないか',
+    whisper: '調和とは、全員が同じ意見になることではなく、違いを認め合うこと',
+    personality: '社交的で公平だが、自分の意見がなく、相手に合わせすぎる傾向。',
+    love: '相手を喜ばせたいという気持ちが強いが、自分の本当の気持ちが見えていない。',
+    pitfall: '八方美人になり、誰からも信頼されない。または決断ができず宙ぶらりんになる。',
+    strengths: 'バランス感覚、社交能力、外交的才能',
+    compatible: ['牡羊座', '双子座', '獅子座'],
+    avoid: ['蟹座', '蠍座'],
+    cyclePos: 7, phase: '収穫期',
+    shadow: '優柔不断と自己喪失',
+    awakening: '自分の軸を持ちながら、相手も尊重する',
+    nextIdx: 7,
+    enneagram: 9,
+    darkState: '自分など存在しない。相手の言うことが全て。周囲の顔色だけを伺い、本当の自分は死んでいる。',
+    darkIdx: 3,
+    darkSlip: '自己喪失',
+    darkAdvice: '自分の意見を持つことは、相手を傷つけることではない。むしろ、本当の関係はそこから始まる。',
+    evolutionAdvice: 'スケールから羅針盤へ。全体のバランスを考えながらも、自分の北極星を持つ。',
+    mythSource: '日本神話',
+    myth: '天の岩戸は調和の象徴。ただし、その調和は天照大御神の光と、その他の神々の力の完璧なバランスで成り立つ。',
+    mythConnect: 'あなたのバランス感覚は、本当は自分の内なる軸があってこそ。その軸を探そう。',
+    kotodama: 'つり合いて、また我あり',
+    message: 'あなたの優しさは本物。今、その優しさの中に、自分の意見を忍ばせる勇気をください。',
+    lightKey: '自信を持つ調和'
+  },
+  {
+    sign: '蠍座', en: 'Scorpio', goddess: '絹旗', theme: '深い感情と執着', glyph: '♏',
+    color: '#8B0000', hook: 'その情熱は、相手を支配していないか',
+    whisper: '深い愛は、相手の自由を許す勇気から生まれる',
+    personality: '感情が深く、強い意志を持つ。ただし、妬みやすく、執着が強い傾向。',
+    love: '相手との絆を深く求めるが、支配欲や独占欲が強くなりやすい。',
+    pitfall: '相手を完全に自分のものにしたいという欲望に支配される。',
+    strengths: '情熱、洞察力、変容力',
+    compatible: ['蟹座', '乙女座', '山羊座'],
+    avoid: ['牡牛座', '獅子座'],
+    cyclePos: 8, phase: '深化期',
+    shadow: '執着と復讐心',
+    awakening: '深い愛が相手を支配するのではなく、解放することに気づく',
+    nextIdx: 8,
+    enneagram: 8,
+    darkState: '相手が全て。相手に裏切られた時、復讐する。愛と憎しみの狂騒。',
+    darkIdx: 5,
+    darkSlip: '執着と支配',
+    darkAdvice: '本当の愛は、相手の自由を許すこと。そこに初めて、本当の絆が生まれる。',
+    evolutionAdvice: 'アメーバのような合一から、二つの星のような独立した輝きへ。',
+    mythSource: '日本神話',
+    myth: '絹旗は勢い。深い感情で全てを変える力がある。しかし、その力は相手を破壊することもできるし、再生させることもできる。',
+    mythConnect: 'あなたの情熱は本物。その力で相手を支配するのではなく、相手を変容させる。',
+    kotodama: '深きもの、また新しく生まれ変わる',
+    message: 'あなたの深さは、世界を変える力。その力を、相手の自由を奪うためではなく、相手と自分を再生させるために使いましょう。',
+    lightKey: '変容的愛情'
+  },
+  {
+    sign: '射手座', en: 'Sagittarius', goddess: '天鈿女', theme: '自由と無責任', glyph: '♐',
+    color: '#FF4500', hook: '自分の自由を求めるあまり、責任から逃げていないか',
+    whisper: '本当の自由は、責任の中にある',
+    personality: '楽観的で冒険好きだが、浅はかで責任感が薄い傾向。約束を守られないことがある。',
+    love: '相手との新しい可能性に惹かれるが、相手との約束を守られず、傷つけることがある。',
+    pitfall: '自分の楽しさだけを優先し、周囲を巻き込んで傷つける。',
+    strengths: '楽観性、冒険心、寛容さ',
+    compatible: ['牡羊座', '獅子座', '天秤座'],
+    avoid: ['蟹座', '乙女座'],
+    cyclePos: 9, phase: '拡大期',
+    shadow: '無責任と逃避',
+    awakening: '自由の中に責任を感じ、その両立を目指す',
+    nextIdx: 9,
+    enneagram: 7,
+    darkState: '責任なんかクソ食らえ。自分の楽しさが全て。相手の気持ちなど知らない。',
+    darkIdx: 1,
+    darkSlip: '無責任',
+    darkAdvice: 'あなたの自由は素晴らしい。ただし、相手にも同じ自由がある。その尊重から、本当の自由が始まる。',
+    evolutionAdvice: '冒険者から探検家へ。知らない世界を旅しながらも、根拠地は守る。',
+    mythSource: '日本神話',
+    myth: '天鈿女命は岩戸の前で踊り、天照大御神を誘い出す。自由で大胆な表現力で、世界を動かす。',
+    mythConnect: 'あなたの自由さと冒険心は、世界を変える力。ただし、その力は相手の自由も尊重するときに初めて輝く。',
+    kotodama: '自由なり、また約束あり',
+    message: 'あなたの自由さは本物。その自由さで、相手も自由にしてあげてください。',
+    lightKey: '責任ある自由'
+  },
+  {
+    sign: '山羊座', en: 'Capricorn', goddess: '稲荷大神', theme: '野心と心の空白', glyph: '♑',
+    color: '#2F4F4F', hook: 'その成功は、本当に欲しいものか。それとも誰かのため？',
+    whisper: '成功とは、心の空白を満たすことではなく、本当にやりたいことを続けることから生まれる',
+    personality: '野心家で実行力があるが、常に不安感がある。成功しても満足できない傾向。',
+    love: '相手を自分の成功のために利用してしまう傾向がある。または相手に依存して成功を求める。',
+    pitfall: '終わりのない野心に駆られ、心の空白を埋められない。人間関係を破壊する。',
+    strengths: '野心、実行力、忍耐力',
+    compatible: ['牡牛座', '乙女座', '蠍座'],
+    avoid: ['双子座', '獅子座'],
+    cyclePos: 10, phase: '成熟期',
+    shadow: '野心と空虚感',
+    awakening: '成功の先に、本当に欲しいものを見つける',
+    nextIdx: 10,
+    enneagram: 3,
+    darkState: '成功だけが全て。相手も自分も、成功のための道具。心なんか不要。',
+    darkIdx: 9,
+    darkSlip: '野心',
+    darkAdvice: '成功した後、あなたを待っているのは何か。その問いに答える勇気を。',
+    evolutionAdvice: 'ピラミッドの頂点から、庭園の中心へ。成功ではなく、本当にやりたいことを。',
+    mythSource: '日本神話',
+    myth: '稲荷大神は豊穣と成功の神。ただし、その成功は個人的な野心ではなく、地域全体の豊かさのためのもの。',
+    mythConnect: 'あなたの野心は、本当は周囲の豊かさを心から望んでいる。その本当の願いを思い出そう。',
+    kotodama: '成就とは、また心なり',
+    message: 'あなたは十分に成功している。今、その成功を相手と分かち合う勇気をください。',
+    lightKey: '利他的成功'
+  },
+  {
+    sign: '水瓶座', en: 'Aquarius', goddess: '布都御魂神', theme: '理想と現実のズレ', glyph: '♒',
+    color: '#4169E1', hook: 'その理想は、本当に自分のものか。それとも観念？',
+    whisper: '理想とは、現実の中で少しずつ実現するもの。完璧な理想の中では誰も生きていない',
+    personality: '理想主義的で革新的だが、現実的ではなく、完璧な理想に執着しやすい。',
+    love: '相手との理想的な関係を求めるが、現実とのズレに失望し、相手を責める傾向。',
+    pitfall: '理想と現実のズレに苦しみ、人間関係を避けるか、相手を理想に強制する。',
+    strengths: '理想主義、革新的思考、独立心',
+    compatible: ['双子座', '獅子座', '天秤座'],
+    avoid: ['牡牛座', '蠍座'],
+    cyclePos: 11, phase: '革新期',
+    shadow: '理想主義と現実逃避',
+    awakening: '理想と現実の対話から、新しい価値を生み出す',
+    nextIdx: 11,
+    enneagram: 5,
+    darkState: '完璧な理想の中でのみ生きたい。現実など汚れている。相手も理想に従うべき。',
+    darkIdx: 7,
+    darkSlip: '観念',
+    darkAdvice: '現実の中で理想を実現することの喜びを知ることが、本当の革新。',
+    evolutionAdvice: '天上の理想家から、大地の革新者へ。両足で立って、世界を変える。',
+    mythSource: '日本神話',
+    myth: '布都御魂神は霊剣の神。理想と現実の間で切り分ける力を持つ。どちらも大切だと知っている。',
+    mythConnect: 'あなたの理想は本物。その理想と現実の間で、新しい価値を切り分けよう。',
+    kotodama: '理想は剣、現実は石。両者を合わせて、新しい世界を切り開く',
+    message: 'あなたの理想は本物。今、その理想を現実の中で少しずつ実現させる勇気をください。',
+    lightKey: '現実的理想主義'
+  },
+  {
+    sign: '魚座', en: 'Pisces', goddess: '瀬織津姫（海への帰還）', theme: '境界線と同調性', glyph: '♓',
+    color: '#00CED1', hook: 'その同調性は、自分を失わせていないか',
+    whisper: '共感は力。ただし、自分の足で立つことも大切',
+    personality: '共感能力が高く同調性があるが、自分と他者の境界線が曖昧で、相手に吸収されやすい。',
+    love: '相手に寄り添おうとするあまり、相手の一部になってしまい、自分が見えなくなる。',
+    pitfall: '相手の感情に完全に支配され、自分の人生を生きられない。または現実逃避する。',
+    strengths: '同情心、直感力、想像力',
+    compatible: ['蟹座', '蠍座', '山羊座'],
+    avoid: ['双子座', '処女座'],
+    cyclePos: 12, phase: '統合期',
+    shadow: '融合と同化',
+    awakening: '共感を持ちながらも、自分の足で立つ力を得る',
+    nextIdx: 0,
+    enneagram: 4,
+    darkState: '自分は存在しない。相手の感情だけが真実。完全に相手に同化し、奴隷になる。',
+    darkIdx: 2,
+    darkSlip: '同化',
+    darkAdvice: '相手に寄り添うことは素晴らしい。ただし、自分の足で立つことも忘れずに。',
+    evolutionAdvice: 'オタマジャクシから、両生類へ。水の中でも、陸の上でも生きられる力を。',
+    mythSource: '日本神話',
+    myth: '瀬織津姫（海への帰還）は、一度禊で汚れを流した後、海に帰り、また陸に上がる。常に変化し、統合する。',
+    mythConnect: 'あなたの同調性は、世界を癒す力。その力で、自分も相手も、新しく生まれ変わらせる。',
+    kotodama: '水は形を持たず、また形を持つ',
+    message: 'あなたの共感は本物。その共感を持ちながら、自分の体も、心も、持つことを許してください。',
+    lightKey: '自立的な共感'
+  }
+];
+
+const ALL_QUESTIONS = [
+  [ // 0: 牡羊座
+    { text: '相手が自分の意見に反対することは許せない', scale: [1,2,3,4,5] },
+    { text: '自分が正しいと思ったら、その考えを変えることはほぼない', scale: [1,2,3,4,5] },
+    { text: '相手よりも自分の利益を優先してしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '自分の意志を通すために、時に強圧的になることがある', scale: [1,2,3,4,5] },
+    { text: '相手の自由や意思を尊重することより、自分の願いが優先される', scale: [1,2,3,4,5] },
+    { text: 'リーダーとして指導することに喜びを感じるが、相手の提案は聞かない傾向がある', scale: [1,2,3,4,5] },
+    { text: '相手が自分に逆らったとき、すぐに怒りや反発を感じてしまう', scale: [1,2,3,4,5] },
+    { text: '周囲よりも自分の力や能力が優れていると思っている', scale: [1,2,3,4,5] },
+    { text: '相手を自分の支配下に置きたいという欲求がある', scale: [1,2,3,4,5] },
+    { text: '相手の気持ちより、自分の気持ちが優先される傾向がある', scale: [1,2,3,4,5] },
+    { text: 'コントロール欲が強く、計画通りに進まないと不安になる', scale: [1,2,3,4,5] },
+    { text: 'あなたの行動で相手が傷つくことがあっても、そのことを気にしない傾向がある', scale: [1,2,3,4,5] }
+  ],
+  [ // 1: 牡牛座
+    { text: '変化することが怖いので、今のままでいたいと思う', scale: [1,2,3,4,5] },
+    { text: '相手が変わることを許せず、同じでいてほしいと思う', scale: [1,2,3,4,5] },
+    { text: '新しいものや環境に適応するのに時間がかかる', scale: [1,2,3,4,5] },
+    { text: '自分のやり方に執着が強く、別のやり方を試すことが難しい', scale: [1,2,3,4,5] },
+    { text: '過去のやり方が一番だと信じているので、新しいやり方を否定しやすい', scale: [1,2,3,4,5] },
+    { text: '安定を求めるあまり、可能性や機会を手放してしまうことがある', scale: [1,2,3,4,5] },
+    { text: '相手の成長や変化を、自分を裏切ることのように感じてしまう', scale: [1,2,3,4,5] },
+    { text: '窮屈さを感じることが多いが、変わることは怖い', scale: [1,2,3,4,5] },
+    { text: 'あなたの執着のせいで、相手を束縛しているかもしれない', scale: [1,2,3,4,5] },
+    { text: '相手があなたと同じペースで進まないことが苛立つ', scale: [1,2,3,4,5] },
+    { text: '頑固さのあまり、相手との関係が窮屈になることがある', scale: [1,2,3,4,5] },
+    { text: '変わることより、変わらないことに安心を感じている', scale: [1,2,3,4,5] }
+  ],
+  [ // 2: 双子座
+    { text: '多くの情報を集めすぎて、本当に大切なものが見えなくなることがある', scale: [1,2,3,4,5] },
+    { text: '言葉で説明することに時間を使い、本当の気持ちを伝えられていない', scale: [1,2,3,4,5] },
+    { text: '複数の顔を持っていて、本当の自分がどれなのかわからなくなることがある', scale: [1,2,3,4,5] },
+    { text: '思考が多方向に散らばり、集中することが難しい', scale: [1,2,3,4,5] },
+    { text: '相手に話すことで距離が生まれることがあると感じている', scale: [1,2,3,4,5] },
+    { text: '思考の迷宮に入り込み、心の声を見失うことがある', scale: [1,2,3,4,5] },
+    { text: '相手を完全には信じられず、常に警戒している部分がある', scale: [1,2,3,4,5] },
+    { text: '情報過多になると、かえって決定ができなくなる', scale: [1,2,3,4,5] },
+    { text: 'あなたのコミュニケーションスタイルが、実は相手を遠ざけているかもしれない', scale: [1,2,3,4,5] },
+    { text: '本当の自分を他者に見せることが怖い傾向がある', scale: [1,2,3,4,5] },
+    { text: '知識があるが、それを本当の知恵に変えられていない', scale: [1,2,3,4,5] },
+    { text: '相手の言葉の表面は理解できるが、本当の気持ちは読み取れないことがある', scale: [1,2,3,4,5] }
+  ],
+  [ // 3: 蟹座
+    { text: '些細なことで傷つき、人間関係を避けてしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '自分の感情に支配されやすく、相手を責めてしまうことがある', scale: [1,2,3,4,5] },
+    { text: '相手の感情ばかりを気にして、自分の気持ちが後回しになる', scale: [1,2,3,4,5] },
+    { text: '期待と現実のズレに、深く傷ついてしまう', scale: [1,2,3,4,5] },
+    { text: '相手に依存し、相手がいないと不安になる傾向がある', scale: [1,2,3,4,5] },
+    { text: '感情的になると、相手に当たってしまうことがある', scale: [1,2,3,4,5] },
+    { text: 'あなたの不安定さが、相手も不安定にしているかもしれない', scale: [1,2,3,4,5] },
+    { text: '過去の傷をずっと引きずり、それを相手のせいにしてしまう', scale: [1,2,3,4,5] },
+    { text: 'あなたを守ろうとしたはずが、実は相手の自由を奪っているかもしれない', scale: [1,2,3,4,5] },
+    { text: '感情的な操作で、相手をコントロールしてしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '殻に籠もり、相手を遠ざけてしまうことがある', scale: [1,2,3,4,5] },
+    { text: 'あなたの感受性は強みだが、時に弱点になっている', scale: [1,2,3,4,5] }
+  ],
+  [ // 4: 獅子座
+    { text: 'あなたが注目されないと、不安になったり不機嫌になったりする', scale: [1,2,3,4,5] },
+    { text: '相手の成功よりも、自分の成功を優先してしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '自分のための舞台を演出することに夢中で、相手のニーズが見えない', scale: [1,2,3,4,5] },
+    { text: 'あなたが主役でないと、関心を失う傾向がある', scale: [1,2,3,4,5] },
+    { text: '相手の成功を心から喜べず、嫉妬してしまうことがある', scale: [1,2,3,4,5] },
+    { text: '自分の価値を、他者からの承認や評価で測ってしまう', scale: [1,2,3,4,5] },
+    { text: '相手の意見より、自分の意見が正しいと思う傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの自意識の高さが、時に相手を傷つけている', scale: [1,2,3,4,5] },
+    { text: '自分の光を見せたいあまり、相手の光を影に追いやっていないか', scale: [1,2,3,4,5] },
+    { text: '承認欲求が強く、それが満たされないと不安になる', scale: [1,2,3,4,5] },
+    { text: '相手をあなたの劇の脇役として扱っているかもしれない', scale: [1,2,3,4,5] },
+    { text: 'あなたの虚栄心が、相手との関係を壊していないか', scale: [1,2,3,4,5] }
+  ],
+  [ // 5: 乙女座
+    { text: 'あなた自身と相手の欠点を見つけて指摘することが多い', scale: [1,2,3,4,5] },
+    { text: '完璧さを求めるあまり、自分にも相手にも厳しすぎる', scale: [1,2,3,4,5] },
+    { text: '相手が完璧でないことに失望し、相手を責めてしまう', scale: [1,2,3,4,5] },
+    { text: '自分の完璧なやり方を相手に強制してしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '細かい欠点を見つけすぎて、全体の良さが見えないことがある', scale: [1,2,3,4,5] },
+    { text: '「〜すべき」という考え方が強く、相手を縛ってしまう', scale: [1,2,3,4,5] },
+    { text: 'あなたの完璧さへの執着が、相手にプレッシャーを与えている', scale: [1,2,3,4,5] },
+    { text: '完璧でない自分に対して、強い自己批判がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの批判的な態度が、相手の自信を奪っているかもしれない', scale: [1,2,3,4,5] },
+    { text: '人間関係が窮屈になるのは、あなたの完璧さへの執着かもしれない', scale: [1,2,3,4,5] },
+    { text: 'あるがままの相手を受け入れることが難しい', scale: [1,2,3,4,5] },
+    { text: 'あなたの厳しさは、実は愛情の現れかもしれないが、相手には負担になっている', scale: [1,2,3,4,5] }
+  ],
+  [ // 6: 天秤座
+    { text: 'あなたの意見がなく、相手に合わせてしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '皆に好かれたいという気持ちから、本当の自分を隠している', scale: [1,2,3,4,5] },
+    { text: '調和を保つために、自分の気持ちを後回しにしてしまう', scale: [1,2,3,4,5] },
+    { text: '決断ができず、いつも宙ぶらりんのままになってしまう', scale: [1,2,3,4,5] },
+    { text: '相手の意見を優先するあまり、自分の価値観が見失われている', scale: [1,2,3,4,5] },
+    { text: '八方美人になることで、誰からも信頼されていないかもしれない', scale: [1,2,3,4,5] },
+    { text: 'あなたが何を思っているのか、相手にもわからないかもしれない', scale: [1,2,3,4,5] },
+    { text: 'バランスを取ることばかり考えて、本当の愛情が伝わっていない', scale: [1,2,3,4,5] },
+    { text: '相手を喜ばせたいという気持ちが強すぎて、自分を失っている', scale: [1,2,3,4,5] },
+    { text: '相手の顔色を伺いすぎて、心が疲弊している', scale: [1,2,3,4,5] },
+    { text: 'あなたの軸がないために、相手も不安になっているかもしれない', scale: [1,2,3,4,5] },
+    { text: 'あなたの意見を持つことは、相手を傷つけることではないことに気づいていない', scale: [1,2,3,4,5] }
+  ],
+  [ // 7: 蠍座
+    { text: 'あなたが相手を支配したいという欲求が強い', scale: [1,2,3,4,5] },
+    { text: '相手への執着が強く、相手の自由を許すことができない', scale: [1,2,3,4,5] },
+    { text: '相手が自分のものでなくなることへの恐怖がある', scale: [1,2,3,4,5] },
+    { text: '相手に裏切られたとき、復讐心が湧き上がってくる', scale: [1,2,3,4,5] },
+    { text: '相手との絆を深く求めるあまり、相手を支配してしまう', scale: [1,2,3,4,5] },
+    { text: '妬み深く、相手が他の人と仲良くすることが許せない', scale: [1,2,3,4,5] },
+    { text: 'あなたの深い感情が、相手を傷つけてしまう可能性がある', scale: [1,2,3,4,5] },
+    { text: '愛と執着の区別がついていない傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたが相手に完全に依存しているかもしれない', scale: [1,2,3,4,5] },
+    { text: '相手が全てなので、相手以外の人間関係は排除してしまう', scale: [1,2,3,4,5] },
+    { text: 'あなたの情熱は本物だが、時に相手を破壊する力になる', scale: [1,2,3,4,5] },
+    { text: '相手の秘密や弱点を握ることで、コントロールしてしまう傾向がある', scale: [1,2,3,4,5] }
+  ],
+  [ // 8: 射手座
+    { text: '自分の自由を求めるあまり、相手の気持ちを無視してしまう', scale: [1,2,3,4,5] },
+    { text: 'あなたの約束は当てにならないと、相手が思っているかもしれない', scale: [1,2,3,4,5] },
+    { text: '責任から逃げ、楽しさだけを求める傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの無責任さが、相手を傷つけていることに気づかない', scale: [1,2,3,4,5] },
+    { text: '浅はかな決断で、他の人を巻き込んでしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたのせいで、相手が予期しない結果に直面している', scale: [1,2,3,4,5] },
+    { text: '現在の楽しさだけを優先して、未来のことは考えていない', scale: [1,2,3,4,5] },
+    { text: 'あなたの気まぐれさが、相手の人生を狂わせている可能性がある', scale: [1,2,3,4,5] },
+    { text: '自分のやりたいことのために、相手を道具にしてしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの自由さが、実は他者への無責任さに変わっている', scale: [1,2,3,4,5] },
+    { text: '楽観性と無責任さの境界線が曖昧になっている', scale: [1,2,3,4,5] },
+    { text: 'あなたの行動で誰かが傷ついても、深く考えずに次へ進んでしまう', scale: [1,2,3,4,5] }
+  ],
+  [ // 9: 山羊座
+    { text: '成功のために、相手も自分も利用してしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '成功を手に入れてもなお、心が満たされない感覚がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの野心のために、相手を支配しようとする', scale: [1,2,3,4,5] },
+    { text: '相手との関係より、成功が優先されている', scale: [1,2,3,4,5] },
+    { text: 'あなたの心は常に不安で、成功しても安心できない', scale: [1,2,3,4,5] },
+    { text: '相手を自分の成功のための踏み台にしてしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたが本当に望んでいるものが、成功以外のものかもしれない', scale: [1,2,3,4,5] },
+    { text: '成功への執着が、あなたの人間関係を破壊している', scale: [1,2,3,4,5] },
+    { text: 'あなたの心の空白を、成功で埋めようとしている', scale: [1,2,3,4,5] },
+    { text: '相手に依存して成功を求めるか、相手を支配する傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの野心は、実は誰かに認めてもらいたいという願いかもしれない', scale: [1,2,3,4,5] },
+    { text: 'あなたは十分に成功しているが、それを認められていない', scale: [1,2,3,4,5] }
+  ],
+  [ // 10: 水瓶座
+    { text: '完璧な理想を求めるあまり、現実の相手を受け入れられない', scale: [1,2,3,4,5] },
+    { text: 'あなたの理想が高すぎて、相手が到達できない', scale: [1,2,3,4,5] },
+    { text: 'あなたの理想と現実のズレに失望し、相手を責めてしまう', scale: [1,2,3,4,5] },
+    { text: '現実的ではない理想に執着し、相手に強制する傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの革新的思考が、実は人間関係を避けるための言い訳かもしれない', scale: [1,2,3,4,5] },
+    { text: '理想と現実のズレに苦しみ、人間関係を避けている', scale: [1,2,3,4,5] },
+    { text: 'あなたが相手に要求する理想が、相手の心を傷つけている', scale: [1,2,3,4,5] },
+    { text: '理想のために現在を犠牲にしてしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの観念が、実は相手を支配するための道具になっている', scale: [1,2,3,4,5] },
+    { text: '現実の小さな幸せを見落としすぎていないか', scale: [1,2,3,4,5] },
+    { text: 'あなたの理想主義が、人間関係を複雑にしている', scale: [1,2,3,4,5] },
+    { text: '理想と現実の間で、いつも不満足さが残っている', scale: [1,2,3,4,5] }
+  ],
+  [ // 11: 魚座
+    { text: '相手の感情に吸収され、自分がどこにいるのかわからなくなる', scale: [1,2,3,4,5] },
+    { text: 'あなたの同調性が強すぎて、相手の奴隷になってしまう傾向がある', scale: [1,2,3,4,5] },
+    { text: '自分と他者の境界線が曖昧で、相手の問題を自分の問題だと思い込む', scale: [1,2,3,4,5] },
+    { text: 'あなたの足で立つことができず、常に誰かに依存している', scale: [1,2,3,4,5] },
+    { text: 'あなたが相手に完全に同化し、自分がなくなっている可能性がある', scale: [1,2,3,4,5] },
+    { text: 'あなたの人生が、相手のためだけの人生になっていないか', scale: [1,2,3,4,5] },
+    { text: 'あなたの共感能力が、実は相手への献身に変わっている', scale: [1,2,3,4,5] },
+    { text: 'あなた自身の夢や目標が、相手に吸収されている', scale: [1,2,3,4,5] },
+    { text: '現実から逃げ、相手の世界に浸ることで、自分を見失っている', scale: [1,2,3,4,5] },
+    { text: 'あなたの優しさが、実は相手への依存を深めているかもしれない', scale: [1,2,3,4,5] },
+    { text: 'あなたは自分の足で立つ力を持っていることに気づいていない', scale: [1,2,3,4,5] },
+    { text: 'あなたの同調性は素晴らしいが、時に相手を支配してしまう', scale: [1,2,3,4,5] }
+  ]
+];
+
+const PREMIUM_DATA = [
+  {
+    letter: `親愛なる${GODDESSES[0].goddess}の魂へ\n\nあなたは太陽のように輝く力を持っています。その輝きで周囲を照らすことができます。しかし、その光が時に相手の自由を奪っていないか、心に問いかけてみてください。\n\n真の指導者とは、相手の光も尊重できる人です。あなたが周囲に与える光に、相手の自由を許す優しさを加えたとき、本当の力が花開きます。`,
+    works: [
+      '相手の意見を最後まで聞き、一度は認める時間を作る',
+      '相手の成功を、自分の成功のように喜ぶ練習',
+      '一日一度、相手の自由と主体性に感謝する瞑想'
+    ],
+    ritual: '毎週日曜、相手の話を何も言わずに聞く時間を30分作りましょう。その時間に、相手の光が自分の光と同じくらい大切であることを感じてください。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[1].goddess}の魂へ\n\nあなたは堅い根を張ることができます。その根がある限り、どんな風が吹いてもあなたは揺らがない。しかし、その根があなたを地に釘付けにしていないか、問いかけてみてください。\n\n安定と成長は相反するものではなく、両立するものです。あなたが新しい枝を伸ばすとき、あなたの根がより深くなることを知ってください。`,
+    works: [
+      '一つの新しい習慣を始め、それを30日間続ける',
+      '自分が変わることで、相手はどう成長するか観察する',
+      '毎日、小さな変化を一つ受け入れる練習'
+    ],
+    ritual: '毎月の初日に、自分が今月変わりたい一つのことを決め、それを紙に書いて壁に貼ります。その変化が、あなたの根をより深くすることに気づきます。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[2].goddess}の魂へ\n\nあなたの思考の翅は、世界を飛び回ることができます。多くを知ることができます。しかし、その翅があなたを本当の場所から離してしまっていないか、問いかけてみてください。\n\n本当の智慧とは、多くを知ることではなく、一つの真実を深く理解することです。あなたが思考の迷宮から抜け出し、心の静寂にたどり着くとき、真の智慧が花開きます。`,
+    works: [
+      '毎日、瞑想の時間を10分作り、思考を静める',
+      '相手と話すときは、まず聞くことに集中する',
+      '複雑な情報を、一つの短い文に統合する練習'
+    ],
+    ritual: '毎週水曜、思考をすべて手放し、相手の言葉だけを聞く2時間を作ります。その時間に、言葉の奥にある本当の気持ちを感じてください。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[3].goddess}の魂へ\n\nあなたの感受性は、世界を感じる力です。その力で、他者の心を癒すことができます。しかし、その感受性があなたを傷つけすぎていないか、問いかけてみてください。\n\nあなたの殻は、あなたを守るためのものです。しかし、それが相手も自分も傷つけているとしたら？その殻を越えて、世界に心を開く勇気を持ってください。`,
+    works: [
+      '毎日、自分の感情を紙に書いて、手放す',
+      '相手の言葉を一度は受け入れる練習',
+      '自分の感受性で他者を助ける一つの行動'
+    ],
+    ritual: '毎月の満月に、あなたの心の殻が少しずつ開いていることに気づく瞑想をします。その殻の中には、世界を変える力がある。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[4].goddess}の魂へ\n\nあなたの光は、世界を照らすことができます。その光を怖がらないでください。しかし、その光が時に他者の光を奪っていないか、問いかけてみてください。\n\nスターから太陽へ。あなたが周囲全体を照らすとき、その光で相手も輝くことに気づいてください。そのとき、あなたの本当の輝きが始まります。`,
+    works: [
+      '相手の小さな成功を、大きく喜ぶ',
+      '自分の光より、相手の光を見つけることを意識する',
+      '一日一度、相手の光に感謝する'
+    ],
+    ritual: '毎週日曜の朝、相手の光がどこにあるか探し、その光が自分の光と同じくらい大切であることを感じてください。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[5].goddess}の魂へ\n\nあなたの清潔さへの目は、世界を浄化する力です。その力で、不要なものを流す勇気を持ってください。しかし、その清潔さへの執着が、あなたも相手も傷つけていないか、問いかけてみてください。\n\n完璧さを求めることから、完全さを受け入れることへ。そのとき、あなたの浄化の力は、本当の許しの力に変わります。`,
+    works: [
+      'あなた自身の不完全さを一つ許す',
+      '相手の欠点を、その人らしさとして受け入れる',
+      '毎日、完璧さへの執着を手放す瞑想'
+    ],
+    ritual: '毎週金曜、自分と相手の「汚れ」ではなく「らしさ」を見つけ、それを愛する時間を作ります。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[6].goddess}の魂へ\n\nあなたのバランス感覚は、世界を調和させる力です。その力で、皆が幸せになることを望んでいます。しかし、その調和のために自分の声を失っていないか、問いかけてみてください。\n\nスケールから羅針盤へ。全体のバランスを見ながらも、自分の北極星を持つ勇気を持ってください。そのとき、あなたの調和は、本当の力に変わります。`,
+    works: [
+      '一日一度、自分の本当の気持ちを相手に伝える',
+      'バランスを考える前に、自分の意見を持つ時間を作る',
+      '相手の違う意見を、自分を傷つけるものではなく、学びとして受け取る'
+    ],
+    ritual: '毎週木曜、相手の前で自分の意見を言う練習をします。最初は小さなことでもいい。あなたの意見も、世界を動かす力を持っている。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[7].goddess}の魂へ\n\nあなたの情熱は、世界を変える力です。その力で、相手を破壊することもできます。しかし、相手を変容させることもできます。その力の使い方を、心に問いかけてみてください。\n\nアメーバのような合一から、二つの星のような独立した輝きへ。相手の自由を許すとき、あなたの愛は本当の力に変わります。`,
+    works: [
+      '相手の自由を、その人の成長のために喜ぶ',
+      '執着の感情が湧いたときは、その奥にある愛を見つける',
+      '相手との絆を深めるために、相手の自由を増やす一つの行動'
+    ],
+    ritual: '毎月の新月に、相手への執着を手放し、相手の自由な成長を祝福する儀式をします。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[8].goddess}の魂へ\n\nあなたの自由さは、世界を開放する力です。その力で、相手も自由にすることができます。しかし、その自由さが時に相手を傷つけていないか、問いかけてみてください。\n\n冒険者から探検家へ。知らない世界を旅しながらも、根拠地を守る責任を知ってください。そのとき、あなたの自由は本当の力に変わります。`,
+    works: [
+      '一つの約束を守ることに集中する',
+      '相手の信頼を得るために、小さな約束から始める',
+      '自分の楽しさと相手のニーズのバランスを考える'
+    ],
+    ritual: '毎週月曜、自分が守った約束を一つ数え、その約束が相手にもたらした喜びを感じてください。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[9].goddess}の魂へ\n\nあなたの野心は、世界を豊かにする力です。その力で、相手も豊かにすることができます。しかし、その野心が時に相手の人生を奪っていないか、問いかけてみてください。\n\nピラミッドの頂点から、庭園の中心へ。成功ではなく、本当にやりたいことを。そのとき、あなたの人生は本当に豊かになります。`,
+    works: [
+      '成功の先に、本当に欲しいものを考える',
+      'あなたの成功を相手と分かち合う喜びを知る',
+      '一日一度、成功以外の幸せを一つ見つける'
+    ],
+    ritual: '毎年の誕生日に、自分の本当にやりたいことは何かを問い直し、その方向に少し軌道修正します。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[10].goddess}の魂へ\n\nあなたの理想は、世界を変える力です。その力で、新しい世界を切り分けることができます。しかし、その理想が時に相手を傷つけていないか、問いかけてみてください。\n\n天上の理想家から、大地の革新者へ。両足で立って、現実の中で理想を実現する勇気を持ってください。そのとき、あなたの理想は本当の力に変わります。`,
+    works: [
+      '理想と現実の小さなズレを受け入れる練習',
+      'あなたの理想を、現実の中で一つ実現させる',
+      '相手の現実を、理想を変える材料として受け取る'
+    ],
+    ritual: '毎月の初日に、あなたの理想を現実に一歩近づけるために、何ができるか考え、その一つを実行します。'
+  },
+  {
+    letter: `親愛なる${GODDESSES[11].goddess}の魂へ\n\nあなたの共感は、世界を癒す力です。その力で、自分も相手も、新しく生まれ変わることができます。しかし、その共感があなたを失わせていないか、問いかけてみてください。\n\nオタマジャクシから、両生類へ。水の中でも、陸の上でも生きられる力を。そのとき、あなたの共感は本当の力に変わります。`,
+    works: [
+      '自分の体と心を持つことを許す',
+      'あなたの足で立つ力があることに気づく',
+      '相手に寄り添いながらも、自分を保つ一つの行動'
+    ],
+    ritual: '毎週木曜、自分の体を感じ、その体がこの世界に存在することに感謝する瞑想をします。'
+  }
+];
+
+const S = { sunIdx: null, moonIdx: null, answers: [], currentQ: 0 };
+
+// Canvas background
+function initCanvas() {
+  const c = document.getElementById('bg-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth;
+  c.height = window.innerHeight;
+  const drawStars = () => {
+    ctx.fillStyle = 'rgba(196,160,80,0.1)';
+    for (let i = 0; i < 200; i++) {
+      const x = Math.random() * c.width;
+      const y = Math.random() * c.height;
+      const r = Math.random() * 1.5;
+      ctx.fillRect(x, y, r, r);
+    }
+  };
+  drawStars();
+  window.addEventListener('resize', () => {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    drawStars();
+  });
+}
+
+function startDiagnosis() {
+  const name = document.getElementById('nameInput').value || 'Guest';
+  const sun = document.getElementById('sunSignSelect').value;
+  const moon = document.getElementById('moonSignSelect').value;
+  if (sun === '' || moon === '') {
+    alert('星座を選択してください');
+    return;
+  }
+  S.sunIdx = parseInt(sun);
+  S.moonIdx = parseInt(moon);
+  S.answers = [];
+  S.currentQ = 0;
+  localStorage.setItem('gd_pending', JSON.stringify({ name, sunIdx: S.sunIdx, moonIdx: S.moonIdx, answers: S.answers }));
+  go('questions');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const qIdx = S.currentQ;
+  const questionsArray = ALL_QUESTIONS[S.sunIdx];
+  const q = questionsArray[qIdx];
+
+  let html = `<div class="question">
+    <p style="font-size: 14px; line-height: 1.8; margin-bottom: 24px; color: var(--text);">${q.text}</p>
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">`;
+
+  for (let i = 1; i <= 5; i++) {
+    const isSelected = S.answers[qIdx] === i ? ' style="background: var(--gold-dim); color: var(--bg);"' : '';
+    html += `<button class="btn" ${isSelected} onclick="recordAnswer(${i})" style="padding: 12px 8px;">${i}</button>`;
+  }
+
+  html += `</div>
+    <div style="font-size: 11px; color: var(--text-dim); margin-top: 16px; text-align: center;">1 = 全く当てはまらない ← → 5 = とても当てはまる</div>
+  </div>`;
+
+  document.getElementById('questionContent').innerHTML = html;
+  document.getElementById('questionProgress').textContent = `Q ${qIdx + 1}/12`;
+  document.getElementById('prevBtn').style.display = qIdx > 0 ? 'inline-block' : 'none';
+  document.getElementById('nextBtn').textContent = qIdx === 11 ? '診断結果を表示 →' : '次へ →';
+}
+
+function recordAnswer(val) {
+  S.answers[S.currentQ] = val;
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (S.answers[S.currentQ] === undefined) {
+    alert('回答を選択してください');
+    return;
+  }
+  if (S.currentQ < 11) {
+    S.currentQ++;
+    renderQuestion();
+  } else {
+    renderResult();
+    go('result');
+  }
+}
+
+function prevQuestion() {
+  if (S.currentQ > 0) {
+    S.currentQ--;
+    renderQuestion();
+  }
+}
+
+function renderResult() {
+  const sunG = GODDESSES[S.sunIdx];
+  const moonG = GODDESSES[S.moonIdx];
+
+  const avgScore = S.answers.reduce((a, b) => a + b, 0) / S.answers.length;
+  const isLightPath = avgScore < 3;
+
+  let html = `
+    <div class="result-card">
+      <div class="goddess-name">${sunG.goddess}</div>
+      <div class="sign-name">${sunG.sign} ${sunG.glyph}</div>
+      <div class="theme">${sunG.theme}</div>
+      <div class="whisper">「${sunG.whisper}」</div>
+
+      <div class="evolution-paths">
+        <div class="evolution-box light">
+          <h4>✧ 光の進化パス</h4>
+          <p>${sunG.message}</p>
+          <p style="margin-top: 12px;"><strong>${sunG.lightKey}</strong></p>
+        </div>
+        <div class="evolution-box dark">
+          <h4>⚡ 闇の滑り</h4>
+          <p>${sunG.darkAdvice}</p>
+        </div>
+      </div>
+
+      <div class="myth-tab-row">
+        <button class="myth-tab active" onclick="showMythTab(0)">神話</button>
+        <button class="myth-tab" onclick="showMythTab(1)">性格</button>
+        <button class="myth-tab" onclick="showMythTab(2)">相性</button>
+      </div>
+
+      <div class="myth-panel active">
+        <p><strong>出典:</strong> ${sunG.mythSource}</p>
+        <p style="margin-top: 12px;">${sunG.myth}</p>
+        <p style="margin-top: 12px; color: var(--gold);">${sunG.mythConnect}</p>
+      </div>
+
+      <div class="myth-panel">
+        <p><strong>性格傾向:</strong></p>
+        <ul style="margin: 12px 0; padding-left: 20px; font-size: 13px; color: var(--text-dim); line-height: 1.8;">
+          <li>💫 ${sunG.personality}</li>
+          <li>💕 ${sunG.love}</li>
+          <li>⚠️ ${sunG.pitfall}</li>
+          <li>✨ 強み: ${sunG.strengths}</li>
+        </ul>
+      </div>
+
+      <div class="myth-panel">
+        <p><strong>相性</strong></p>
+        <p style="margin: 12px 0; color: var(--gold);">✓ 相性良好: ${sunG.compatible.join(', ')}</p>
+        <p style="color: #c44569;">✗ 避けた方が無難: ${sunG.avoid.join(', ')}</p>
+      </div>
+  `;
+
+  if (isPremiumUnlocked()) {
+    const premData = PREMIUM_DATA[S.sunIdx];
+    html += `
+      <div class="premium-section">
+        <div class="premium-label">📬 プレミアムコンテンツ</div>
+        <h3>${sunG.goddess}からの手紙</h3>
+        <p>${premData.letter.split('\n').join('<br>')}</p>
+
+        <h3 style="margin-top: 24px; font-size: 14px;">魂の課題と覚醒のワーク</h3>
+        ${premData.works.map(w => `<div class="work-item">🌱 ${w}</div>`).join('')}
+
+        <h3 style="margin-top: 24px; font-size: 14px;">✦ 覚醒の儀式</h3>
+        <p style="margin-top: 12px;">${premData.ritual}</p>
+      </div>
+    `;
+  }
+
+  html += `
+    <div style="text-align: center; margin: 24px 0;">
+      <button class="btn" onclick="dlPDF(false)">📄 無料PDF (基本情報)</button>
+      <button class="btn" style="margin-left: 12px;" onclick="dlPDF(true)" id="premiumBtn" ${!isPremiumUnlocked() ? 'style="display: none;"' : ''}>💎 プレミアムPDF</button>
+    </div>
+  `;
+
+  html += `</div>`;
+
+  html += renderStripePanel();
+
+  document.getElementById('resultContent').innerHTML = html;
+}
+
+function showMythTab(idx) {
+  const tabs = document.querySelectorAll('.myth-tab');
+  const panels = document.querySelectorAll('.myth-panel');
+  tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+  panels.forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
+function isPremiumUnlocked() {
+  return sessionStorage.getItem('gd_premium') === 'true'
+      || localStorage.getItem('gd_premium_session') === String(S.sunIdx);
+}
+
+function renderStripePanel() {
+  if (isPremiumUnlocked()) {
+    return `<div class="stripe-panel">
+      <h3>✓ プレミアムコンテンツが有効です</h3>
+      <p>女神からの手紙、魂の課題、覚醒の儀式をお楽しみください。</p>
+    </div>`;
+  }
+  return `<div class="stripe-panel">
+    <h3>プレミアムコンテンツをアンロック</h3>
+    <p>女神からの手紙、魂の課題、覚醒の儀式を含む、より深い診断結果をお読みください。</p>
+    <div class="price">¥330</div>
+    <button class="btn-buy" onclick="buyPremium()">🔓 プレミアムを購入</button>
+    <p style="font-size: 11px; margin-top: 12px; color: var(--text-dim);">Stripe決済 | 安全 & 快速</p>
+  </div>`;
+}
+
+function buyPremium() {
+  const pending = {
+    sunIdx: S.sunIdx,
+    moonIdx: S.moonIdx,
+    answers: S.answers
+  };
+  localStorage.setItem('gd_pending', JSON.stringify(pending));
+  window.location.href = STRIPE_URL + '?client_reference_id=' + encodeURIComponent(JSON.stringify({sunIdx: S.sunIdx}));
+}
+
+function checkPaymentReturn() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('gd_paid') !== 'true') return;
+
+  history.replaceState({}, '', window.location.pathname);
+
+  const raw = localStorage.getItem('gd_pending');
+  if (!raw) return;
+
+  try {
+    const saved = JSON.parse(raw);
+    S.sunIdx = saved.sunIdx;
+    S.moonIdx = saved.moonIdx;
+    S.answers = saved.answers;
+    localStorage.removeItem('gd_pending');
+    sessionStorage.setItem('gd_premium', 'true');
+    localStorage.setItem('gd_premium_session', String(S.sunIdx));
+    renderResult();
+    go('result');
+  } catch (e) {
+    console.error('Payment return error:', e);
+  }
+}
+
+function dlPDF(isPremium) {
+  const g = GODDESSES[S.sunIdx];
+  const premData = PREMIUM_DATA[S.sunIdx];
+
+  let html = `<html><head><meta charset="UTF-8"><style>
+    body { font-family: 'Noto Sans JP', sans-serif; background: white; color: #333; margin: 40px; line-height: 1.8; }
+    h1 { font-size: 28px; color: #333; margin: 20px 0; }
+    h2 { font-size: 18px; color: #333; margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 5px; }
+    p { margin: 10px 0; }
+    .section { margin: 30px 0; }
+    .whisper { background: #f5f5f5; padding: 15px; border-left: 3px solid #999; margin: 15px 0; }
+    .evolution-box { background: #f9f9f9; padding: 12px; margin: 12px 0; border-left: 3px solid #999; }
+    .work-item { margin: 10px 0; padding-left: 20px; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    td { padding: 8px; border: 1px solid #ddd; }
+    @media print { body { margin: 20px; } }
+  </style></head><body>`;
+
+  html += `<h1>${g.goddess}</h1>
+    <p><strong>星座:</strong> ${g.sign} ${g.glyph}</p>
+    <p><strong>テーマ:</strong> ${g.theme}</p>
+    <div class="whisper">${g.whisper}</div>`;
+
+  html += `<div class="section">
+    <h2>神話</h2>
+    <p><strong>出典:</strong> ${g.mythSource}</p>
+    <p>${g.myth}</p>
+    <p style="color: #666; font-style: italic;">${g.mythConnect}</p>
+  </div>`;
+
+  html += `<div class="section">
+    <h2>性格傾向</h2>
+    <p><strong>性格:</strong> ${g.personality}</p>
+    <p><strong>恋愛:</strong> ${g.love}</p>
+    <p><strong>落とし穴:</strong> ${g.pitfall}</p>
+    <p><strong>強み:</strong> ${g.strengths}</p>
+  </div>`;
+
+  html += `<div class="section">
+    <h2>相性</h2>
+    <p><strong>✓ 相性良好:</strong> ${g.compatible.join(', ')}</p>
+    <p><strong>✗ 避けた方が無難:</strong> ${g.avoid.join(', ')}</p>
+  </div>`;
+
+  html += `<div class="section">
+    <h2>光と闇の進化パス</h2>
+    <div class="evolution-box">
+      <strong>✧ 光の進化:</strong> ${g.lightKey} — ${g.message}
+    </div>
+    <div class="evolution-box">
+      <strong>⚡ 闇の滑り:</strong> ${g.darkSlip} — ${g.darkAdvice}
+    </div>
+  </div>`;
+
+  if (isPremium && premData) {
+    html += `<div class="section" style="page-break-before: always;">
+      <h2>📬 ${g.goddess}からの手紙</h2>
+      <p>${premData.letter.split('\n').join('<br>')}</p>
+    </div>`;
+
+    html += `<div class="section">
+      <h2>魂の課題と覚醒のワーク</h2>
+      ${premData.works.map(w => `<div class="work-item">🌱 ${w}</div>`).join('')}
+    </div>`;
+
+    html += `<div class="section">
+      <h2>✦ 覚醒の儀式</h2>
+      <p>${premData.ritual}</p>
+    </div>`;
+  }
+
+  html += `</body></html>`;
+
+  const w = window.open('', '', 'width=800,height=600');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 250);
+}
+
+function go(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screen).classList.add('active');
+}
+
+window.addEventListener('load', () => {
+  initCanvas();
+  checkPaymentReturn();
+});
+</script>
+
+</body>
+</html>
