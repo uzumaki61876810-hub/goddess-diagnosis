@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12女神診断 ─ 魂の成長診断ツール</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Cinzel+Decorative:wght@400;700&family=Shippori+Mincho:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #0d0a12;
+    --paper: #f5f0e8;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #7a6330;
+    --crimson: #8b1a2c;
+    --mist: #c8d4d8;
+    --void: #090710;
+    --shine: rgba(201,168,76,0.15);
+    --grad1: linear-gradient(135deg, #0d0a12 0%, #1a1228 50%, #0a0d1a 100%);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Shippori Mincho', serif;
+    background: var(--void);
+    color: var(--paper);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Stars background */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 60%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 75%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 35% 55%, rgba(201,168,76,0.3) 0%, transparent 100%),
+      radial-gradient(2px 2px at 65% 45%, rgba(201,168,76,0.2) 0%, transparent 100%),
+      var(--grad1);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .container {
+    position:relative;
+    z-index:1;
+    max-width:780px;
+    margin:0 auto;
+    padding:20px 16px 60px;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    text-align:center;
+    padding:60px 0 40px;
+    position:relative;
+  }
+  .header::after {
+    content:'';
+    display:block;
+    width:200px;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin:24px auto 0;
+  }
+  .header-en {
+    font-family:'Cinzel Decorative', serif;
+    font-size:clamp(10px,2.5vw,13px);
+    letter-spacing:0.4em;
+    color:var(--gold-dim);
+    margin-bottom:16px;
+    text-transform:uppercase;
+  }
+  .header-title {
+    font-family:'Cinzel Decorative', serif;
+    font-size:clamp(22px,5vw,40px);
+    color:var(--gold);
+    line-height:1.3;
+    text-shadow:0 0 40px rgba(201,168,76,0.4);
+  }
+  .header-jp {
+    font-family:'Noto Serif JP', serif;
+    font-size:clamp(13px,2.5vw,16px);
+    color:var(--mist);
+    margin-top:12px;
+    letter-spacing:0.2em;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:32px 0;
+    color:var(--gold-dim);
+    font-size:18px;
+  }
+  .divider::before,.divider::after {
+    content:'';
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold-dim));
+  }
+  .divider::after { background:linear-gradient(90deg, var(--gold-dim), transparent); }
+
+  /* ─── CARD ─── */
+  .card {
+    background:rgba(13,10,18,0.7);
+    border:1px solid rgba(201,168,76,0.2);
+    border-radius:2px;
+    padding:32px;
+    margin-bottom:24px;
+    backdrop-filter:blur(10px);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before {
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .card-title {
+    font-family:'Noto Serif JP', serif;
+    font-size:18px;
+    color:var(--gold);
+    margin-bottom:20px;
+    letter-spacing:0.15em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .step-badge {
+    font-family:'Cinzel Decorative', serif;
+    font-size:11px;
+    background:var(--gold);
+    color:var(--void);
+    padding:2px 10px;
+    border-radius:20px;
+    letter-spacing:0.1em;
+  }
+
+  /* ─── FORM ELEMENTS ─── */
+  label {
+    display:block;
+    font-size:13px;
+    color:var(--mist);
+    margin-bottom:6px;
+    letter-spacing:0.1em;
+  }
+  input[type=date], input[type=text], select {
+    width:100%;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(201,168,76,0.25);
+    border-radius:1px;
+    color:var(--paper);
+    padding:12px 16px;
+    font-family:'Shippori Mincho', serif;
+    font-size:15px;
+    outline:none;
+    transition:border-color 0.3s;
+    -webkit-appearance:none;
+  }
+  input[type=date]:focus, select:focus {
+    border-color:var(--gold);
+    background:rgba(201,168,76,0.05);
+  }
+  select option { background:#1a1228; }
+
+  .zodiac-display {
+    margin-top:16px;
+    padding:16px;
+    border:1px solid rgba(201,168,76,0.15);
+    background:rgba(201,168,76,0.05);
+    text-align:center;
+    display:none;
+  }
+  .zodiac-display.show { display:block; }
+  .zodiac-name {
+    font-family:'Cinzel Decorative', serif;
+    font-size:22px;
+    color:var(--gold);
+    letter-spacing:0.1em;
+  }
+  .zodiac-sub { font-size:13px; color:var(--mist); margin-top:4px; }
+
+  /* ─── QUESTIONS ─── */
+  .question-block {
+    margin-bottom:28px;
+    padding-bottom:28px;
+    border-bottom:1px solid rgba(201,168,76,0.1);
+  }
+  .question-block:last-child { border-bottom:none; }
+  .q-num {
+    font-family:'Cinzel Decorative', serif;
+    font-size:10px;
+    color:var(--gold-dim);
+    letter-spacing:0.2em;
+    margin-bottom:6px;
+  }
+  .q-text {
+    font-family:'Noto Serif JP', serif;
+    font-size:15px;
+    line-height:1.8;
+    margin-bottom:14px;
+    color:var(--paper);
+  }
+  .likert {
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .likert label {
+    flex:1;
+    min-width:50px;
+    text-align:center;
+    cursor:pointer;
+    margin:0;
+  }
+  .likert input[type=radio] { display:none; }
+  .likert .l-box {
+    display:block;
+    padding:8px 4px;
+    border:1px solid rgba(201,168,76,0.2);
+    border-radius:1px;
+    font-size:11px;
+    color:var(--mist);
+    transition:all 0.2s;
+    line-height:1.3;
+  }
+  .likert input[type=radio]:checked + .l-box {
+    background:var(--gold);
+    color:var(--void);
+    border-color:var(--gold);
+    font-weight:bold;
+  }
+  .likert label:hover .l-box {
+    border-color:var(--gold-light);
+    color:var(--gold-light);
+  }
+
+  /* ─── QUIZ ─── */
+  .quiz-block {
+    margin-bottom:24px;
+    padding:20px;
+    border:1px solid rgba(201,168,76,0.15);
+  }
+  .quiz-q {
+    font-family:'Noto Serif JP', serif;
+    font-size:14px;
+    line-height:1.8;
+    margin-bottom:12px;
+    color:var(--paper);
+  }
+  .quiz-opts { display:flex; flex-direction:column; gap:8px; }
+  .quiz-opts label {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    padding:8px 12px;
+    border:1px solid rgba(201,168,76,0.1);
+    transition:all 0.2s;
+    margin:0;
+    font-size:13px;
+    color:var(--mist);
+  }
+  .quiz-opts label:hover { border-color:var(--gold-dim); color:var(--paper); }
+  .quiz-opts input[type=radio] { accent-color:var(--gold); }
+  .quiz-opts input[type=radio]:checked + span { color:var(--gold); }
+
+  /* ─── PROGRESS ─── */
+  .progress-bar {
+    height:2px;
+    background:rgba(201,168,76,0.15);
+    margin:16px 0;
+    position:relative;
+  }
+  .progress-fill {
+    height:100%;
+    background:linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition:width 0.3s;
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:14px 36px;
+    font-family:'Noto Serif JP', serif;
+    font-size:15px;
+    letter-spacing:0.15em;
+    cursor:pointer;
+    border:none;
+    border-radius:1px;
+    transition:all 0.3s;
+  }
+  .btn-primary {
+    background:linear-gradient(135deg, var(--gold-dim), var(--gold));
+    color:var(--void);
+    font-weight:700;
+    width:100%;
+    margin-top:24px;
+    box-shadow:0 0 30px rgba(201,168,76,0.2);
+  }
+  .btn-primary:hover {
+    background:linear-gradient(135deg, var(--gold), var(--gold-light));
+    box-shadow:0 0 50px rgba(201,168,76,0.4);
+    transform:translateY(-1px);
+  }
+  .btn-secondary {
+    background:transparent;
+    border:1px solid var(--gold-dim);
+    color:var(--gold);
+    font-size:13px;
+    padding:10px 24px;
+  }
+  .btn-secondary:hover { border-color:var(--gold); background:var(--shine); }
+  .btn-twitter {
+    background:#1DA1F2;
+    color:#fff;
+    font-size:13px;
+    padding:10px 24px;
+  }
+  .btn-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+
+  /* ─── RESULT ─── */
+  #screen-result { display:none; }
+  .result-goddess {
+    text-align:center;
+    padding:40px 20px;
+    position:relative;
+  }
+  .goddess-circle {
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:50px;
+    margin:0 auto 20px;
+    background:radial-gradient(circle, rgba(201,168,76,0.1), transparent);
+    box-shadow:0 0 40px rgba(201,168,76,0.2);
+  }
+  .goddess-name-en {
+    font-family:'Cinzel Decorative', serif;
+    font-size:11px;
+    color:var(--gold-dim);
+    letter-spacing:0.3em;
+    margin-bottom:6px;
+  }
+  .goddess-name {
+    font-family:'Noto Serif JP', serif;
+    font-size:clamp(24px,5vw,36px);
+    color:var(--gold);
+    font-weight:700;
+    text-shadow:0 0 30px rgba(201,168,76,0.5);
+  }
+  .goddess-key {
+    font-size:14px;
+    color:var(--mist);
+    margin-top:8px;
+    letter-spacing:0.2em;
+  }
+
+  .result-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin:24px 0;
+  }
+  @media(max-width:480px){ .result-grid{grid-template-columns:1fr;} }
+
+  .result-box {
+    padding:20px;
+    border:1px solid rgba(201,168,76,0.2);
+    background:rgba(201,168,76,0.03);
+    text-align:center;
+  }
+  .result-box-label {
+    font-size:11px;
+    color:var(--gold-dim);
+    letter-spacing:0.2em;
+    margin-bottom:8px;
+  }
+  .result-box-value {
+    font-family:'Noto Serif JP', serif;
+    font-size:18px;
+    color:var(--gold-light);
+    font-weight:500;
+  }
+  .result-box-sub { font-size:12px; color:var(--mist); margin-top:4px; }
+
+  .growth-path {
+    padding:20px 24px;
+    border-left:2px solid var(--gold-dim);
+    margin:20px 0;
+    background:rgba(201,168,76,0.03);
+  }
+  .growth-path-title {
+    font-size:12px;
+    color:var(--gold-dim);
+    letter-spacing:0.2em;
+    margin-bottom:12px;
+  }
+  .growth-step {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    font-size:14px;
+  }
+  .growth-step.current { color:var(--gold); font-weight:500; }
+  .growth-step.next { color:var(--mist); }
+  .growth-step.future { color:rgba(200,212,216,0.4); }
+  .arrow { color:var(--gold-dim); }
+
+  .health-bar {
+    margin:20px 0;
+    padding:16px 20px;
+    border:1px solid rgba(201,168,76,0.15);
+  }
+  .health-label { font-size:12px; color:var(--mist); margin-bottom:10px; letter-spacing:0.1em; }
+  .health-track {
+    height:6px;
+    background:rgba(255,255,255,0.05);
+    border-radius:3px;
+    position:relative;
+  }
+  .health-fill {
+    height:100%;
+    border-radius:3px;
+    background:linear-gradient(90deg, var(--crimson), var(--gold));
+    transition:width 1s ease;
+  }
+  .health-num {
+    font-family:'Cinzel Decorative', serif;
+    font-size:24px;
+    color:var(--gold);
+    float:right;
+    margin-top:-4px;
+  }
+
+  .message-box {
+    padding:24px;
+    border:1px solid rgba(201,168,76,0.2);
+    background:rgba(201,168,76,0.04);
+    font-family:'Noto Serif JP', serif;
+    font-size:14px;
+    line-height:2;
+    color:var(--paper);
+    margin:20px 0;
+    position:relative;
+  }
+  .message-box::before {
+    content:'"';
+    font-family:'Cinzel Decorative', serif;
+    font-size:60px;
+    color:rgba(201,168,76,0.15);
+    position:absolute;
+    top:-10px;
+    left:10px;
+    line-height:1;
+  }
+
+  .advanced-section {
+    display:none;
+    margin-top:24px;
+    padding-top:24px;
+    border-top:1px solid rgba(201,168,76,0.15);
+  }
+  .advanced-section.show { display:block; }
+  .advanced-tag {
+    display:inline-block;
+    font-family:'Cinzel Decorative', serif;
+    font-size:10px;
+    letter-spacing:0.2em;
+    color:var(--gold-dim);
+    border:1px solid var(--gold-dim);
+    padding:2px 10px;
+    margin-bottom:16px;
+  }
+
+  /* ─── HISTORY ─── */
+  .history-item {
+    padding:12px 16px;
+    border:1px solid rgba(201,168,76,0.1);
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:13px;
+    color:var(--mist);
+  }
+  .history-goddess { color:var(--gold-light); font-family:'Noto Serif JP', serif; }
+
+  /* ─── SCREEN TRANSITIONS ─── */
+  .screen { animation:fadeIn 0.5s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--void); }
+  ::-webkit-scrollbar-thumb { background:var(--gold-dim); border-radius:3px; }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    text-align:center;
+    padding:40px 0 20px;
+    font-size:11px;
+    color:var(--gold-dim);
+    letter-spacing:0.2em;
+  }
+
+  .error-msg { color:#e07070; font-size:13px; margin-top:8px; display:none; }
+  .error-msg.show { display:block; }
+
+  @media print {
+    body { background:white; color:#333; }
+    .btn, .btn-row { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-en">Twelve Goddess Soul Diagnosis</div>
+    <h1 class="header-title">12 女神診断</h1>
+    <p class="header-jp">日本神話 × 西洋占星術 × 心理学による魂の成長診断</p>
+  </div>
+
+  <!-- SCREEN 0: TOP -->
+  <div id="screen-top" class="screen">
+    <div class="card">
+      <p style="font-size:14px;line-height:2;color:var(--mist);text-align:center;">
+        古事記に記された12柱の女神が、あなたの魂の深層を照らします。<br>
+        生年月日・36問の心理テスト・神話クイズを通じ、<br>
+        あなたの太陽女神・現在女神・成長経路を診断します。
+      </p>
+      <div class="divider">✦</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;margin-bottom:8px;">
+        <div>
+          <div style="font-family:'Cinzel Decorative',serif;font-size:11px;color:var(--gold-dim);letter-spacing:0.1em;margin-bottom:4px;">STEP 1</div>
+          <div style="font-size:13px;color:var(--mist);">生年月日入力</div>
+        </div>
+        <div>
+          <div style="font-family:'Cinzel Decorative',serif;font-size:11px;color:var(--gold-dim);letter-spacing:0.1em;margin-bottom:4px;">STEP 2</div>
+          <div style="font-size:13px;color:var(--mist);">36問心理テスト</div>
+        </div>
+        <div>
+          <div style="font-family:'Cinzel Decorative',serif;font-size:11px;color:var(--gold-dim);letter-spacing:0.1em;margin-bottom:4px;">STEP 3</div>
+          <div style="font-size:13px;color:var(--mist);">神話クイズ5問</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="showScreen('birth')">診断をはじめる ✦</button>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="history-section" style="display:none;" class="card">
+      <div class="card-title">⟡ 過去の診断履歴</div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: BIRTH DATE -->
+  <div id="screen-birth" class="screen" style="display:none;">
+    <div class="card">
+      <div class="card-title"><span class="step-badge">Step 1</span> 生年月日・生まれた時刻・場所を入力</div>
+
+      <label>生年月日</label>
+      <input type="date" id="birthdate" max="2010-12-31" min="1920-01-01" value="1980-01-01" onchange="onBirthChange()">
+
+      <div style="margin-top:16px;">
+        <label>生まれた時刻（わかる場合）</label>
+        <input type="time" id="birthtime" value="12:00" onchange="onBirthChange()">
+        <div style="font-size:11px;color:var(--gold-dim);margin-top:4px;">不明な場合は 12:00 のままで。誤差が生じる場合があります。</div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <label>生まれた場所</label>
+        <select id="birthplace" onchange="onBirthChange()">
+          <optgroup label="日本">
+            <option value="135,35" selected>日本（標準 / 東経135度）</option>
+            <option value="141,43">北海道・東北</option>
+            <option value="140,36">関東（東京・埼玉・千葉など）</option>
+            <option value="136,35">中部・東海（名古屋・静岡など）</option>
+            <option value="135,35">近畿（大阪・京都・神戸など）</option>
+            <option value="133,34">中国・四国（広島・岡山など）</option>
+            <option value="130,33">九州（福岡・熊本・鹿児島など）</option>
+            <option value="128,26">沖縄・南西諸島</option>
+          </optgroup>
+          <optgroup label="海外（主要都市）">
+            <option value="0,51">ロンドン（UTC+0）</option>
+            <option value="-74,41">ニューヨーク（UTC-5）</option>
+            <option value="-118,34">ロサンゼルス（UTC-8）</option>
+            <option value="2,49">パリ（UTC+1）</option>
+            <option value="116,40">北京（UTC+8）</option>
+            <option value="103,1">シンガポール（UTC+8）</option>
+            <option value="151,-34">シドニー（UTC+10）</option>
+            <option value="77,29">ニューデリー（UTC+5:30）</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="zodiac-display" id="zodiac-display">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:11px;color:var(--gold-dim);letter-spacing:0.15em;margin-bottom:4px;">☀ 太陽星座</div>
+            <div class="zodiac-name" id="zodiac-sun-sign" style="font-size:18px;"></div>
+            <div class="zodiac-sub" id="zodiac-sun-goddess"></div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--gold-dim);letter-spacing:0.15em;margin-bottom:4px;">☽ 月星座</div>
+            <div class="zodiac-name" id="zodiac-moon-sign" style="font-size:18px;"></div>
+            <div class="zodiac-sub" id="zodiac-moon-goddess"></div>
+          </div>
+        </div>
+        <div id="moon-accuracy-note" style="font-size:11px;color:var(--gold-dim);margin-top:10px;text-align:left;"></div>
+      </div>
+
+      <div class="error-msg" id="birth-error">生年月日を入力してください</div>
+      <button class="btn btn-primary" onclick="goToQuestions()">次へ：心理テスト →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: QUESTIONS -->
+  <div id="screen-questions" class="screen" style="display:none;">
+    <div class="card">
+      <div class="card-title"><span class="step-badge">Step 2</span> 36問 心理テスト</div>
+      <p style="font-size:13px;color:var(--mist);margin-bottom:16px;">直感でお答えください。5段階で回答します。</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="q-progress" style="width:0%"></div>
+      </div>
+      <div id="questions-list"></div>
+      <div class="error-msg" id="q-error">全ての質問に回答してください</div>
+      <button class="btn btn-primary" onclick="goToQuiz()">次へ：神話クイズ →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: QUIZ -->
+  <div id="screen-quiz" class="screen" style="display:none;">
+    <div class="card">
+      <div class="card-title"><span class="step-badge">Step 3</span> 神話クイズ 5問</div>
+      <p style="font-size:13px;color:var(--mist);margin-bottom:16px;">知識レベルを測る5問です。わからなくても大丈夫。</p>
+      <div id="quiz-list"></div>
+      <div class="error-msg" id="quiz-error">全ての問題に回答してください</div>
+      <button class="btn btn-primary" onclick="calcResult()">✦ 診断結果を見る</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: RESULT -->
+  <div id="screen-result" class="screen">
+    <div id="result-content">
+      <div class="card">
+        <div class="result-goddess">
+          <div class="goddess-circle" id="res-icon"></div>
+          <div class="goddess-name-en" id="res-name-en"></div>
+          <div class="goddess-name" id="res-name"></div>
+          <div class="goddess-key" id="res-key"></div>
+        </div>
+
+        <div class="health-bar">
+          <div class="health-label">健全度スコア</div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="health-track" style="flex:1;">
+              <div class="health-fill" id="health-fill" style="width:0%"></div>
+            </div>
+            <div class="health-num" id="health-num">—</div>
+          </div>
+          <div style="font-size:12px;color:var(--mist);margin-top:8px;" id="health-desc"></div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-box">
+            <div class="result-box-label">☀ 太陽女神</div>
+            <div class="result-box-value" id="res-sun"></div>
+            <div class="result-box-sub" id="res-sun-sign"></div>
+          </div>
+          <div class="result-box">
+            <div class="result-box-label">☽ 月女神</div>
+            <div class="result-box-value" id="res-moon"></div>
+            <div class="result-box-sub" id="res-moon-sign"></div>
+          <div style="font-size:11px;color:var(--gold-dim);margin-top:6px;" id="res-moon-msg"></div>
+          </div>
+        </div>
+
+        <div class="growth-path">
+          <div class="growth-path-title">— 魂の成長経路 —</div>
+          <div id="growth-steps"></div>
+        </div>
+
+        <div class="message-box" id="res-message"></div>
+
+        <!-- ADVANCED: shown if quiz score >= 3 -->
+        <div class="advanced-section" id="advanced-section">
+          <div class="advanced-tag">ADVANCED ─ 上級者向け詳細</div>
+          <div class="result-grid">
+            <div class="result-box">
+              <div class="result-box-label">知識レベル</div>
+              <div class="result-box-value" id="adv-level"></div>
+            </div>
+            <div class="result-box">
+              <div class="result-box-label">クイズ正答率</div>
+              <div class="result-box-value" id="adv-score"></div>
+            </div>
+          </div>
+          <div class="result-box" style="margin-top:12px;">
+            <div class="result-box-label">原典エピソード</div>
+            <div style="font-size:13px;line-height:1.8;color:var(--mist);text-align:left;padding:4px 0;" id="adv-episode"></div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="downloadPDF()">📄 PDF保存</button>
+          <button class="btn btn-twitter" onclick="shareTwitter()">𝕏 シェア</button>
+          <button class="btn btn-secondary" onclick="retake()">再診断</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">✦ 12 GODDESS DIAGNOSIS ✦ Based on Kojiki &amp; Japanese Mythology ✦</div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   DATA
+════════════════════════════════════════ */
+const ZODIAC_DATA = [
+  { sign:'牡羊座', en:'Aries', sun:'スセリビメ', moon:'ククリヒメ', sunKey:'決断と突破', moonKey:'縁結びと調和',
+    sunIcon:'🌸', moonIcon:'🕸️', start:[3,21], end:[4,19],
+    episode:'スセリビメは出雲の大国主神の正室となり、嫉妬と愛の試練を超えて真の決断力を得た。',
+    message:'あなたの魂には、迷わず進む力が宿っています。恐れを手放し、自分の直感を信じて。' },
+  { sign:'牡牛座', en:'Taurus', sun:'ウケモチ', moon:'トヨウケヒメ', sunKey:'豊穣と慈養', moonKey:'食と生命の守護',
+    sunIcon:'🌾', moonIcon:'🍚', start:[4,20], end:[5,20],
+    episode:'ウケモチは口から食物を生み出し、月読命に斬られた後もその身から五穀が芽吹いた。',
+    message:'あなたの存在そのものが、周りを豊かにする力を持っています。与えることを恐れないで。' },
+  { sign:'双子座', en:'Gemini', sun:'イワナガヒメ', moon:'イザナミ', sunKey:'永遠と大地の力', moonKey:'生と死の境界',
+    sunIcon:'🪨', moonIcon:'🌑', start:[5,21], end:[6,21],
+    episode:'イワナガヒメは磐の如き不変の力を持つが、美しさより強さゆえ選ばれなかった悲しみを知る。',
+    message:'人と違うことがあなたの本当の強さです。比べることをやめた時、本来の力が目覚めます。' },
+  { sign:'蟹座', en:'Cancer', sun:'トヨタマヒメ', moon:'セオリツヒメ', sunKey:'深海の愛護', moonKey:'清めと浄化',
+    sunIcon:'🐉', moonIcon:'💧', start:[6,22], end:[7,22],
+    episode:'トヨタマヒメは海神の娘として、人間の夫との愛を守るために真の姿を隠し続けた。',
+    message:'深い愛情を持つあなたは、他者を守るために自分を犠牲にしすぎている。自分も大切に。' },
+  { sign:'獅子座', en:'Leo', sun:'ククリヒメ', moon:'スセリビメ', sunKey:'縁と結界の力', moonKey:'決断の炎',
+    sunIcon:'🕸️', moonIcon:'🌸', start:[7,23], end:[8,22],
+    episode:'ククリヒメは白山の神として、この世のあらゆる縁を結び、神と人の言葉を繋ぐ。',
+    message:'あなたには人と人を繋ぐ特別な才能があります。その才能で、世界を変える縁を創れる。' },
+  { sign:'乙女座', en:'Virgo', sun:'トヨウケヒメ', moon:'アメノウズメ', sunKey:'奉仕と養育', moonKey:'芸術と解放',
+    sunIcon:'🍚', moonIcon:'💃', start:[8,23], end:[9,22],
+    episode:'トヨウケヒメは天照大神の食事を司り、伊勢外宮に祀られ、人々の命を静かに守り続ける。',
+    message:'縁の下で支えるあなたの力は、誰よりも本質的です。自分の貢献に誇りを持ってください。' },
+  { sign:'天秤座', en:'Libra', sun:'イチキシマヒメ', moon:'オオゲツヒメ', sunKey:'美と調和の神格', moonKey:'大地の再生',
+    sunIcon:'🌊', moonIcon:'🌱', start:[9,23], end:[10,23],
+    episode:'イチキシマヒメは宗像三女神の中心として、海を渡る命と富の行き来を守護する美の神。',
+    message:'美しさと公平さを同時に追い求めるあなた。その審美眼は世界をより美しくする力です。' },
+  { sign:'蠍座', en:'Scorpio', sun:'アメノサグメ', moon:'ウケモチ', sunKey:'予言と冥界の知', moonKey:'豊穣の再生',
+    sunIcon:'🌙', moonIcon:'🌾', start:[10,24], end:[11,22],
+    episode:'アメノサグメは月読命の使いとして、太陽の世界から離れた闇の知識を持つ予言の女神。',
+    message:'深淵を覗くあなたには、他者には見えない真実が見えています。その洞察力を恐れないで。' },
+  { sign:'射手座', en:'Sagittarius', sun:'アメノウズメ', moon:'イワナガヒメ', sunKey:'歓喜と道開き', moonKey:'不動の意志',
+    sunIcon:'💃', moonIcon:'🪨', start:[11,23], end:[12,21],
+    episode:'アメノウズメは岩戸の前で神楽を舞い、天照大神を引き出した、笑いと芸術の女神。',
+    message:'あなたの喜びは伝染する力を持っています。本当にやりたいことで、世界を明るくできる。' },
+  { sign:'山羊座', en:'Capricorn', sun:'イザナミ', moon:'イチキシマヒメ', sunKey:'死と再生の母', moonKey:'美と交易の守護',
+    sunIcon:'🌑', moonIcon:'🌊', start:[12,22], end:[1,19],
+    episode:'イザナミは日本の国土と神々を産み、黄泉の国の主として、生と死の循環を司る根源の神。',
+    message:'あなたは一度失ったものから最も強くなる人。どん底を知るからこそ、頂点に立てる。' },
+  { sign:'水瓶座', en:'Aquarius', sun:'セオリツヒメ', moon:'アメノサグメ', sunKey:'清流と革新', moonKey:'影の知恵',
+    sunIcon:'💧', moonIcon:'🌙', start:[1,20], end:[2,18],
+    episode:'セオリツヒメは祓いの女神として、罪や穢れを川の流れに乗せて海へと運ぶ浄化の神。',
+    message:'古いものを手放す勇気があなたを自由にする。流れに乗ることが今必要なことです。' },
+  { sign:'魚座', en:'Pisces', sun:'オオゲツヒメ', moon:'トヨタマヒメ', sunKey:'大地の再生と犠牲', moonKey:'海の愛護',
+    sunIcon:'🌱', moonIcon:'🐉', start:[2,19], end:[3,20],
+    episode:'オオゲツヒメは体から食物を生み出し、死後も五穀・蚕・麻として大地に生き続けた再生の神。',
+    message:'あなたの魂は何度でも再生する力を持っています。終わりはいつも新しい始まりの種。' },
+];
+
+const GROWTH_PATHS = [
+  ['ウケモチ','トヨタマヒメ','イチキシマヒメ','セオリツヒメ'],
+  ['スセリビメ','アメノサグメ','トヨウケヒメ','イザナミ'],
+  ['イワナガヒメ','アメノウズメ','ククリヒメ','オオゲツヒメ'],
+];
+
+const QUESTIONS = [
+  // 感情・内面
+  {text:'自分の感情を素直に表現できる', g:'emotion'},
+  {text:'他者の痛みを自分のことのように感じる', g:'emotion'},
+  {text:'怒りを感じた時、それを適切に表現できる', g:'emotion'},
+  {text:'喜びを感じると、周りにも伝えたくなる', g:'emotion'},
+  {text:'悲しい時、誰かに頼ることができる', g:'emotion'},
+  {text:'自分の弱さを認めることができる', g:'emotion'},
+  // 意志・行動
+  {text:'困難な状況でも自分の意見を言える', g:'will'},
+  {text:'長期的な目標のために今の快楽を我慢できる', g:'will'},
+  {text:'失敗しても諦めずに続けることができる', g:'will'},
+  {text:'自分が正しいと思ったことは、反対があっても行動する', g:'will'},
+  {text:'新しい挑戦を恐れずに踏み出せる', g:'will'},
+  {text:'締め切りや約束を守ることができる', g:'will'},
+  // 関係・社会
+  {text:'初めて会う人とも打ち解けやすい', g:'social'},
+  {text:'グループの中で自然にリードすることがある', g:'social'},
+  {text:'友人の相談に親身になって乗ることができる', g:'social'},
+  {text:'自分と違う価値観の人を受け入れられる', g:'social'},
+  {text:'誰かのために何かをすることに喜びを感じる', g:'social'},
+  {text:'対立が起きた時、仲裁役に回ることが多い', g:'social'},
+  // 創造・精神
+  {text:'美しいものに触れると深く感動する', g:'spirit'},
+  {text:'夢や直感を大切にしている', g:'spirit'},
+  {text:'自然の中にいると心が落ち着く', g:'spirit'},
+  {text:'目に見えない力や縁の存在を感じることがある', g:'spirit'},
+  {text:'創造的な活動（芸術・料理・文章など）に喜びを感じる', g:'spirit'},
+  {text:'神話や伝説など古い物語に惹かれる', g:'spirit'},
+  // 変容・成長
+  {text:'過去の自分と今の自分は大きく変わっていると思う', g:'growth'},
+  {text:'喪失や別れを経験した後、より強くなれた', g:'growth'},
+  {text:'自分の影（嫌いな部分）を見つめることができる', g:'growth'},
+  {text:'人生の転機を、成長のチャンスととらえられる', g:'growth'},
+  {text:'自分を変えたいという意欲がある', g:'growth'},
+  {text:'今より深い自分を知りたいという欲求がある', g:'growth'},
+  // 豊かさ・奉仕
+  {text:'自分が豊かになることと、人を助けることは両立できると思う', g:'serve'},
+  {text:'自分の才能を社会のために使いたい', g:'serve'},
+  {text:'見返りを求めず誰かを助けることができる', g:'serve'},
+  {text:'自分の「与える力」を大切にしている', g:'serve'},
+  {text:'誰かの役に立てた時、深い満足を感じる', g:'serve'},
+  {text:'自分が満たされれば、自然と周りを満たせると思う', g:'serve'},
+];
+
+const QUIZ = [
+  {
+    q:'アメノウズメが岩戸の前で行った行為は何ですか？',
+    opts:['祈りを捧げた','踊り狂い笑いを引き起こした','泣き叫んだ','呪文を唱えた'],
+    ans:1,
+    exp:'アメノウズメは岩戸の前で神楽舞を踊り、八百万の神々を笑わせた。その笑い声に天照大神が扉を開けた。'
+  },
+  {
+    q:'イザナミが亡くなった原因は何ですか？',
+    opts:['嵐に打たれた','海に沈んだ','火の神カグツチを産んだ時','夫に捨てられた'],
+    ans:2,
+    exp:'イザナミは火の神・カグツチを産んだ際に焼け死んだ。これにより黄泉の国の主となった。'
+  },
+  {
+    q:'スセリビメの父親は誰ですか？',
+    opts:['天照大神','スサノオノミコト','大国主命','ツクヨミ'],
+    ans:1,
+    exp:'スセリビメはスサノオノミコトの娘。出雲の地で大国主命と出会い正室となった。'
+  },
+  {
+    q:'宗像三女神のうち、イチキシマヒメはどこに祀られていますか？',
+    opts:['厳島神社（広島）','伊勢神宮（三重）','出雲大社（島根）','熱田神宮（愛知）'],
+    ans:0,
+    exp:'イチキシマヒメは厳島神社（宮島）に祀られており、世界遺産にも登録されている美と海の女神。'
+  },
+  {
+    q:'オオゲツヒメが死後に変化したものとして正しいのはどれですか？',
+    opts:['海と川','五穀・蚕・麻','風と雷','花と木'],
+    ans:1,
+    exp:'オオゲツヒメはスサノオに斬られた後、その身体から稲・麦・粟・蚕・豆・麻が生まれた。食と農業の起源神話。'
+  },
+];
+
+const LIKERT_LABELS = ['全くそう思わない','あまり思わない','どちらでもない','ややそう思う','強くそう思う'];
+
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+let state = { birthdate:'', zodiacIndex:-1, moonZodiacIndex:-1, answers:[], quizAnswers:[], healthScore:0, quizScore:0 };
+
+/* ════════════════════════════════════════
+   SCREEN CONTROL
+════════════════════════════════════════ */
+function showScreen(name) {
+  ['top','birth','questions','quiz','result'].forEach(s => {
+    const el = document.getElementById('screen-'+s);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById('screen-'+name);
+  if (target) { target.style.display = 'block'; target.scrollIntoView({behavior:'smooth',block:'start'}); }
+}
+
+/* ════════════════════════════════════════
+   MOON POSITION CALCULATION
+   簡易天文計算（Jean Meeus "Astronomical Algorithms" 簡略版）
+   精度：±1〜2度（実用的に約1日以内の誤差）
+════════════════════════════════════════ */
+function calcMoonLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525.0;
+  // 月の平均経度
+  let L0 = 218.3164477 + 481267.88123421*T - 0.0015786*T*T + T*T*T/538841 - T*T*T*T/65194000;
+  // 月の平均近点角
+  let M  = 134.9633964 + 477198.8675055*T + 0.0087414*T*T + T*T*T/69699 - T*T*T*T/14712000;
+  // 太陽の平均近点角
+  let Ms = 357.5291092 + 35999.0502909*T - 0.0001536*T*T + T*T*T/24490000;
+  // 月の緯度引数
+  let F  = 93.2720950 + 483202.0175233*T - 0.0036539*T*T - T*T*T/3526000 + T*T*T*T/863310000;
+  // 主要補正
+  const D = 297.8501921 + 445267.1114034*T - 0.0018819*T*T + T*T*T/545868 - T*T*T*T/113065000;
+  const rad = Math.PI/180;
+  M  = M  % 360; Ms = Ms % 360; F = F % 360; const Dr = D*rad;
+  const Mr = M*rad; const Msr = Ms*rad; const Fr = F*rad;
+  // 主要な摂動項（上位14項）
+  const dL =
+    6288774*Math.sin(Mr) +
+    1274027*Math.sin(2*Dr - Mr) +
+     658314*Math.sin(2*Dr) +
+     213618*Math.sin(2*Mr) +
+    -185116*Math.sin(Msr) +
+    -114332*Math.sin(2*Fr) +
+      58793*Math.sin(2*Dr - 2*Mr) +
+      57066*Math.sin(2*Dr - Msr - Mr) +
+      53322*Math.sin(2*Dr + Mr) +
+      45758*Math.sin(2*Dr - Msr) +
+     -40923*Math.sin(Msr - Mr) +
+     -34720*Math.sin(Dr) +
+     -30383*Math.sin(Msr + Mr) +
+      15327*Math.sin(2*Dr - 2*Fr);
+  let lon = L0 + dL / 1000000.0;
+  lon = ((lon % 360) + 360) % 360;
+  return lon;
+}
+
+function dateToJD(year, month, day, hour, min, utcOffsetHours) {
+  // UT時刻に変換
+  let ut = hour + min/60 - utcOffsetHours;
+  let d = day + ut/24;
+  if (month <= 2) { year--; month += 12; }
+  const A = Math.floor(year/100);
+  const B = 2 - A + Math.floor(A/4);
+  return Math.floor(365.25*(year+4716)) + Math.floor(30.6001*(month+1)) + d + B - 1524.5;
+}
+
+function lonToZodiacIndex(lon) {
+  // 0=牡羊,1=牡牛,...11=魚
+  return Math.floor(lon / 30);
+}
+
+// 太陽黄経（簡易）
+function calcSunLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525.0;
+  const M = (357.5291092 + 35999.0502909*T) * Math.PI/180;
+  const L0 = 280.46646 + 36000.76983*T;
+  const C = (1.9146-0.004817*T-0.000014*T*T)*Math.sin(M)
+           +(0.019993-0.000101*T)*Math.sin(2*M)
+           +0.00029*Math.sin(3*M);
+  return ((L0 + C) % 360 + 360) % 360;
+}
+
+// 黄道順（牡羊座から）のZODIAC_DATA インデックスへ変換
+// ZODIAC_DATA は牡羊(0),牡牛(1),...魚(11) の順なので lonToZodiacIndex と一致
+function eclipticIdxToDataIdx(eclIdx) {
+  return eclIdx; // 同順
+}
+
+/* ════════════════════════════════════════
+   ZODIAC CALCULATION  (entry point)
+════════════════════════════════════════ */
+function onBirthChange() { calcZodiac(); }
+
+function calcZodiac() {
+  const val = document.getElementById('birthdate').value;
+  if (!val) return;
+  const timeVal = document.getElementById('birthtime').value || '12:00';
+  const placeVal = document.getElementById('birthplace').value;
+  const [lonDeg, latDeg] = placeVal.split(',').map(Number);
+  // UTC offset from longitude (rough estimate; ignores DST)
+  const utcOffset = Math.round(lonDeg / 15);
+
+  const [year, month, day] = val.split('-').map(Number);
+  const [hour, min] = timeVal.split(':').map(Number);
+
+  const jd = dateToJD(year, month, day, hour, min, utcOffset);
+
+  // 太陽星座
+  const sunLon = calcSunLongitude(jd);
+  const sunEclIdx = lonToZodiacIndex(sunLon);
+  const sunDataIdx = eclipticIdxToDataIdx(sunEclIdx);
+
+  // 月星座
+  const moonLon = calcMoonLongitude(jd);
+  const moonEclIdx = lonToZodiacIndex(moonLon);
+  const moonDataIdx = eclipticIdxToDataIdx(moonEclIdx);
+
+  state.zodiacIndex = sunDataIdx;
+  state.moonZodiacIndex = moonDataIdx;
+  state.birthdate = val;
+
+  const sunZ = ZODIAC_DATA[sunDataIdx];
+  const moonZ = ZODIAC_DATA[moonDataIdx];
+
+  document.getElementById('zodiac-sun-sign').textContent = sunZ.sign;
+  document.getElementById('zodiac-sun-goddess').textContent = '太陽女神：' + sunZ.sun;
+  document.getElementById('zodiac-moon-sign').textContent = moonZ.sign;
+  document.getElementById('zodiac-moon-goddess').textContent = '月女神：' + moonZ.moon;
+
+  // 精度注記：時刻未入力の場合
+  const timeDefault = timeVal === '12:00';
+  const note = timeDefault
+    ? '※ 時刻は12:00で計算しています。月星座は約2.5日で移動するため、生まれた時刻によって変わる場合があります。'
+    : '※ 月星座は簡易天文計算による推定値です（誤差±1〜2度）。';
+  document.getElementById('moon-accuracy-note').textContent = note;
+  document.getElementById('zodiac-display').classList.add('show');
+}
+
+/* ════════════════════════════════════════
+   BUILD QUESTIONS
+════════════════════════════════════════ */
+function buildQuestions() {
+  const container = document.getElementById('questions-list');
+  container.innerHTML = '';
+  QUESTIONS.forEach((q,i) => {
+    const div = document.createElement('div');
+    div.className = 'question-block';
+    div.innerHTML = `
+      <div class="q-num">Q${String(i+1).padStart(2,'0')}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="likert" id="likert-${i}">
+        ${LIKERT_LABELS.map((l,j)=>`
+          <label>
+            <input type="radio" name="q${i}" value="${j+1}" onchange="updateProgress()">
+            <span class="l-box">${j+1}<br><span style="font-size:9px;">${l}</span></span>
+          </label>
+        `).join('')}
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function updateProgress() {
+  const answered = QUESTIONS.filter((_,i) => document.querySelector(`input[name=q${i}]:checked`)).length;
+  document.getElementById('q-progress').style.width = (answered/QUESTIONS.length*100)+'%';
+}
+
+/* ════════════════════════════════════════
+   BUILD QUIZ
+════════════════════════════════════════ */
+function buildQuiz() {
+  const container = document.getElementById('quiz-list');
+  container.innerHTML = '';
+  QUIZ.forEach((q,i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-block';
+    div.innerHTML = `
+      <div class="quiz-q">Q${i+1}. ${q.q}</div>
+      <div class="quiz-opts">
+        ${q.opts.map((o,j)=>`
+          <label>
+            <input type="radio" name="quiz${i}" value="${j}">
+            <span>${o}</span>
+          </label>
+        `).join('')}
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+function goToQuestions() {
+  if (!document.getElementById('birthdate').value) {
+    document.getElementById('birth-error').classList.add('show'); return;
+  }
+  buildQuestions();
+  showScreen('questions');
+}
+
+function goToQuiz() {
+  const missing = QUESTIONS.some((_,i) => !document.querySelector(`input[name=q${i}]:checked`));
+  if (missing) { document.getElementById('q-error').classList.add('show'); return; }
+  document.getElementById('q-error').classList.remove('show');
+  // collect answers
+  state.answers = QUESTIONS.map((_,i) => +document.querySelector(`input[name=q${i}]:checked`).value);
+  buildQuiz();
+  showScreen('quiz');
+}
+
+/* ════════════════════════════════════════
+   CALCULATE RESULT
+════════════════════════════════════════ */
+function calcResult() {
+  const missing = QUIZ.some((_,i) => !document.querySelector(`input[name=quiz${i}]:checked`));
+  if (missing) { document.getElementById('quiz-error').classList.add('show'); return; }
+
+  state.quizAnswers = QUIZ.map((_,i) => +document.querySelector(`input[name=quiz${i}]:checked`).value);
+  state.quizScore = state.quizAnswers.reduce((acc,ans,i) => acc + (ans===QUIZ[i].ans?1:0), 0);
+
+  // Health score: average of all answers, scale 1-9
+  const avg = state.answers.reduce((a,b)=>a+b,0) / state.answers.length;
+  state.healthScore = Math.round(1 + (avg-1) * (8/4)); // 1-5 → 1-9
+  state.healthScore = Math.max(1, Math.min(9, state.healthScore));
+
+  renderResult();
+  saveHistory();
+  showScreen('result');
+}
+
+/* ════════════════════════════════════════
+   RENDER RESULT
+════════════════════════════════════════ */
+function renderResult() {
+  const z = ZODIAC_DATA[state.zodiacIndex];
+
+  // Determine "current" goddess based on answer pattern
+  // Find which growth path contains the sun goddess
+  let currentGoddess = z.sun;
+  let pathIndex = -1;
+  let posInPath = 0;
+  GROWTH_PATHS.forEach((path,pi) => {
+    const pos = path.indexOf(z.sun);
+    if (pos >= 0) { pathIndex = pi; posInPath = pos; }
+  });
+
+  // Shift position based on health score
+  if (state.healthScore >= 7) posInPath = posInPath; // already at sun
+  else if (state.healthScore >= 5) posInPath = Math.max(0, posInPath-1);
+  else posInPath = Math.max(0, posInPath-2);
+
+  if (pathIndex >= 0) {
+    currentGoddess = GROWTH_PATHS[pathIndex][posInPath] || z.sun;
+  }
+
+  // Find current goddess data
+  const currentData = ZODIAC_DATA.find(zd => zd.sun === currentGoddess || zd.moon === currentGoddess) || z;
+
+  document.getElementById('res-icon').textContent = z.sunIcon;
+  document.getElementById('res-name-en').textContent = z.en.toUpperCase() + ' / ' + z.sign;
+  document.getElementById('res-name').textContent = z.sun;
+  document.getElementById('res-key').textContent = '── ' + z.sunKey + ' ──';
+  document.getElementById('res-sun').textContent = z.sun;
+  document.getElementById('res-sun-sign').textContent = z.sign + ' ☀';
+  const mz = ZODIAC_DATA[state.moonZodiacIndex >= 0 ? state.moonZodiacIndex : state.zodiacIndex];
+  document.getElementById('res-moon').textContent = mz.moon;
+  document.getElementById('res-moon-sign').textContent = mz.sign + ' ☽';
+  const moonMsgEl = document.getElementById('res-moon-msg');
+  if (moonMsgEl) moonMsgEl.textContent = '苦手・課題テーマ：' + mz.moonKey;
+
+  // Health bar
+  const pct = ((state.healthScore-1)/8*100).toFixed(0);
+  setTimeout(() => { document.getElementById('health-fill').style.width = pct+'%'; }, 100);
+  document.getElementById('health-num').textContent = state.healthScore;
+  const healthDescs = ['','魂の再生の始まり','','内なる力に気づく段階','','自己統合が進んでいる','','本来の輝きへ','完全な自己実現'];
+  document.getElementById('health-desc').textContent = healthDescs[state.healthScore-1] || '';
+
+  // Growth path
+  if (pathIndex >= 0) {
+    const path = GROWTH_PATHS[pathIndex];
+    const steps = document.getElementById('growth-steps');
+    steps.innerHTML = path.map((g,i) => {
+      let cls = 'future', marker = '◦';
+      if (i < posInPath) { cls = 'next'; marker = '◦'; }
+      if (i === posInPath) { cls = 'current'; marker = '★'; }
+      if (i > posInPath) { cls = 'future'; marker = '◦'; }
+      return `<div class="growth-step ${cls}">${marker} ${g}${i===posInPath?' 《現在》':''}</div>${i<path.length-1?'<div class="growth-step"><span class="arrow">↓</span></div>':''}`;
+    }).join('');
+    // Next
+    if (posInPath < path.length-1) {
+      const nextG = path[(posInPath+1)%path.length];
+      steps.innerHTML += `<div style="font-size:12px;color:var(--gold-dim);margin-top:8px;">次の成長女神：${nextG}</div>`;
+    }
+  }
+
+  document.getElementById('res-message').textContent = z.message;
+
+  // Advanced
+  if (state.quizScore >= 3) {
+    document.getElementById('advanced-section').classList.add('show');
+    const levels = ['','','','初級','中級','中級','上級','上級','マスター','神話学者'];
+    document.getElementById('adv-level').textContent = levels[state.quizScore+4] || '中級';
+    document.getElementById('adv-score').textContent = state.quizScore + '/5問';
+    document.getElementById('adv-episode').textContent = z.episode;
+  }
+}
+
+/* ════════════════════════════════════════
+   HISTORY
+════════════════════════════════════════ */
+function saveHistory() {
+  const z = ZODIAC_DATA[state.zodiacIndex];
+  const record = {
+    date: new Date().toLocaleDateString('ja-JP'),
+    goddess: z.sun,
+    sign: z.sign,
+    health: state.healthScore
+  };
+  let hist = JSON.parse(localStorage.getItem('goddess_history')||'[]');
+  hist.unshift(record);
+  hist = hist.slice(0,5);
+  localStorage.setItem('goddess_history', JSON.stringify(hist));
+}
+
+function loadHistory() {
+  const hist = JSON.parse(localStorage.getItem('goddess_history')||'[]');
+  if (hist.length === 0) return;
+  const section = document.getElementById('history-section');
+  const list = document.getElementById('history-list');
+  section.style.display = 'block';
+  list.innerHTML = hist.map(h => `
+    <div class="history-item">
+      <div><span class="history-goddess">${h.goddess}</span> （${h.sign}）</div>
+      <div>健全度 ${h.health} ─ ${h.date}</div>
+    </div>
+  `).join('');
+}
+
+/* ════════════════════════════════════════
+   SHARE / EXPORT
+════════════════════════════════════════ */
+function shareTwitter() {
+  const z = ZODIAC_DATA[state.zodiacIndex];
+  const text = `🌸 12女神診断の結果\n太陽女神：${z.sun}（${z.sign}）\n${z.sunKey}\n健全度：${state.healthScore}/9\n\n#12女神診断 #日本神話`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text), '_blank');
+}
+
+function downloadPDF() {
+  const el = document.getElementById('result-content');
+  const opt = {
+    margin: 10,
+    filename: '12女神診断結果.pdf',
+    image: { type:'jpeg', quality:0.95 },
+    html2canvas: { scale:2, useCORS:true, backgroundColor:'#090710' },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait' }
+  };
+  html2pdf().set(opt).from(el).save();
+}
+
+function retake() {
+  state = { birthdate:'', zodiacIndex:-1, answers:[], quizAnswers:[], healthScore:0, quizScore:0 };
+  document.getElementById('birthdate').value = '';
+  document.getElementById('zodiac-display').classList.remove('show');
+  document.getElementById('advanced-section').classList.remove('show');
+  showScreen('top');
+  loadHistory();
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+window.onload = () => {
+  loadHistory();
+  showScreen('top');
+};
+</script>
+</body>
+</html>
