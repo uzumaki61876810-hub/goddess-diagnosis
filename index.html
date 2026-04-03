@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>12女神診断 ─ 魂の成長診断ツール</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Cinzel+Decorative:wght@400;700&family=Shippori+Mincho:wght@300;400;500&display=swap');
 
@@ -532,9 +531,42 @@
   .error-msg { color:#e07070; font-size:13px; margin-top:8px; display:none; }
   .error-msg.show { display:block; }
 
+  /* STRIPE PANEL */
+  .stripe-panel {
+    background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(100,190,160,0.06));
+    border: 1px solid rgba(201,168,76,0.35);
+    padding: 28px 24px;
+    margin: 24px 0;
+    text-align: center;
+    border-radius: 4px;
+  }
+  .stripe-panel h3 { font-size:16px; color:var(--gold); letter-spacing:0.1em; margin-bottom:10px; }
+  .stripe-panel p { font-size:13px; color:var(--mist); line-height:1.8; margin-bottom:16px; }
+  .stripe-price { font-size:26px; color:var(--gold-light); margin:12px 0; letter-spacing:0.1em; }
+  .btn-buy {
+    background: var(--gold-dim); color: var(--paper);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 12px 28px; font-size:13px; letter-spacing:0.15em;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .btn-buy:hover { background: var(--gold); color: #0d0a12; }
+
   @media print {
-    body { background:white; color:#333; }
-    .btn, .btn-row { display:none; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: white !important; color: #333 !important; }
+    .container { background: white !important; }
+    .card, .result-section { background: white !important; border: 1px solid #ddd !important; }
+    .btn, .btn-row, .stripe-panel, .footer, #screen-top, #screen-questions, #screen-quiz { display: none !important; }
+    #screen-result { display: block !important; }
+    .result-box { background: #f9f9f9 !important; border: 1px solid #ddd !important; }
+    .result-box-label { color: #666 !important; }
+    .result-box-value { color: #333 !important; }
+    .message-box { background: #f5f5f5 !important; color: #333 !important; border: 1px solid #ddd !important; }
+    .growth-path { background: #f9f9f9 !important; border: 1px solid #ddd !important; }
+    .growth-step.current { color: #333 !important; }
+    .advanced-section { background: #f5f0e8 !important; border: 1px solid #ddd !important; display: block !important; }
+    h1, h2, h3 { color: #333 !important; }
+    [style*="color:var(--gold)"], [style*="color: var(--gold)"] { color: #666 !important; }
   }
 </style>
 </head>
@@ -729,8 +761,12 @@
           </div>
         </div>
 
+        <!-- STRIPE PANEL -->
+        <div class="stripe-panel" id="stripe-panel"></div>
+
         <div class="btn-row">
-          <button class="btn btn-secondary" onclick="downloadPDF()">📄 PDF保存</button>
+          <button class="btn btn-secondary" onclick="downloadPDF(false)">📄 無料PDF</button>
+          <button class="btn btn-secondary" id="btn-premium-pdf" onclick="downloadPDF(true)" style="display:none;">💎 プレミアムPDF</button>
           <button class="btn btn-twitter" onclick="shareTwitter()">𝕏 シェア</button>
           <button class="btn btn-secondary" onclick="retake()">再診断</button>
         </div>
@@ -1182,6 +1218,9 @@ function renderResult() {
 
   document.getElementById('res-message').textContent = z.message;
 
+  // Stripe panel
+  setTimeout(() => renderStripePanel(), 50);
+
   // Advanced
   if (state.quizScore >= 3) {
     document.getElementById('advanced-section').classList.add('show');
@@ -1232,16 +1271,97 @@ function shareTwitter() {
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text), '_blank');
 }
 
-function downloadPDF() {
-  const el = document.getElementById('result-content');
-  const opt = {
-    margin: 10,
-    filename: '12女神診断結果.pdf',
-    image: { type:'jpeg', quality:0.95 },
-    html2canvas: { scale:2, useCORS:true, backgroundColor:'#090710' },
-    jsPDF: { unit:'mm', format:'a4', orientation:'portrait' }
-  };
-  html2pdf().set(opt).from(el).save();
+/* ════ STRIPE ════ */
+const STRIPE_URL = 'https://buy.stripe.com/9B6cN64xHfYUb2o4a0d3i00';
+
+function isPremiumUnlocked() {
+  return sessionStorage.getItem('gd_premium') === 'true'
+      || localStorage.getItem('gd_premium_session') === String(state.zodiacIndex);
+}
+
+function renderStripePanel() {
+  const panel = document.getElementById('stripe-panel');
+  if (!panel) return;
+  if (isPremiumUnlocked()) {
+    panel.innerHTML = `<h3>✓ プレミアムコンテンツが有効です</h3>
+      <p>プレミアムPDFに原典エピソード・魂の課題・成長アドバイスが含まれます。</p>`;
+    const btn = document.getElementById('btn-premium-pdf');
+    if (btn) btn.style.display = 'inline-block';
+  } else {
+    panel.innerHTML = `<h3>プレミアムPDFをアンロック</h3>
+      <p>原典エピソード・魂の課題・成長アドバイスを含む詳細レポートをPDFで入手できます。</p>
+      <div class="stripe-price">¥330</div>
+      <button class="btn-buy" onclick="buyPremium()">🔓 購入してPDFを受け取る</button>
+      <p style="font-size:11px;margin-top:10px;color:var(--mist);">Stripe安全決済</p>`;
+  }
+}
+
+function buyPremium() {
+  localStorage.setItem('gd_pending', JSON.stringify({
+    zodiacIndex: state.zodiacIndex,
+    moonZodiacIndex: state.moonZodiacIndex,
+    healthScore: state.healthScore,
+    quizScore: state.quizScore
+  }));
+  window.location.href = STRIPE_URL;
+}
+
+function checkPaymentReturn() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('gd_paid') !== 'true') return;
+  history.replaceState({}, '', window.location.pathname);
+  const raw = localStorage.getItem('gd_pending');
+  if (!raw) return;
+  try {
+    const saved = JSON.parse(raw);
+    state.zodiacIndex = saved.zodiacIndex;
+    state.moonZodiacIndex = saved.moonZodiacIndex;
+    state.healthScore = saved.healthScore;
+    state.quizScore = saved.quizScore;
+    localStorage.removeItem('gd_pending');
+    sessionStorage.setItem('gd_premium', 'true');
+    localStorage.setItem('gd_premium_session', String(state.zodiacIndex));
+    renderResult();
+    renderStripePanel();
+    showScreen('result');
+  } catch(e) { console.error(e); }
+}
+
+function downloadPDF(isPremium) {
+  const z = ZODIAC_DATA[state.zodiacIndex];
+  const mz = ZODIAC_DATA[state.moonZodiacIndex >= 0 ? state.moonZodiacIndex : state.zodiacIndex];
+
+  let body = `
+    <h1 style="font-size:26px;margin-bottom:4px;">${z.sun}</h1>
+    <p style="color:#666;margin-bottom:20px;">${z.sign} ☀ / ${mz.moon} ☽</p>
+    <h2>太陽女神</h2>
+    <p><strong>${z.sun}</strong>（${z.sign}）─ ${z.sunKey}</p>
+    <h2 style="margin-top:20px;">月女神</h2>
+    <p><strong>${mz.moon}</strong>（${mz.sign}）─ ${mz.moonKey}</p>
+    <h2 style="margin-top:20px;">魂のメッセージ</h2>
+    <p>${z.message}</p>`;
+
+  if (isPremium) {
+    body += `
+    <h2 style="margin-top:24px;page-break-before:always;">原典エピソード</h2>
+    <p>${z.episode}</p>
+    <h2 style="margin-top:20px;">魂の課題</h2>
+    <p>${z.moonKey}のテーマと向き合い、${z.sunKey}を通じて本来の力を開花させましょう。</p>
+    <h2 style="margin-top:20px;">成長アドバイス</h2>
+    <p>${mz.moon}のエネルギーを活かしながら、${z.sun}の光で未来を照らしてください。日々の実践として、${z.sunKey}を意識した行動を一つ選んで継続することをお勧めします。</p>`;
+  }
+
+  const html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+    <style>
+      body{font-family:'Noto Serif JP','游明朝',serif;margin:40px;color:#333;line-height:1.8;}
+      h1{color:#333;} h2{color:#555;border-bottom:1px solid #ddd;padding-bottom:6px;margin-top:20px;}
+      p{margin:10px 0;}
+    </style></head><body>${body}</body></html>`;
+
+  const w = window.open('', '_blank', 'width=800,height=700');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 300);
 }
 
 function retake() {
@@ -1258,6 +1378,7 @@ function retake() {
 ════════════════════════════════════════ */
 window.onload = () => {
   loadHistory();
+  checkPaymentReturn();
   showScreen('top');
 };
 </script>
