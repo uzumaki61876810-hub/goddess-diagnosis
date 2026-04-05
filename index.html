@@ -571,6 +571,7 @@
 </style>
 </head>
 <body>
+<div id="top-warm-overlay" style="position:fixed;inset:0;background:linear-gradient(160deg,rgba(40,70,48,0.55) 0%,rgba(28,48,32,0.35) 30%,rgba(15,24,18,0.1) 55%,transparent 75%);pointer-events:none;z-index:1;display:none;transition:opacity 0.6s ease;"></div>
 <div class="container">
 
   <!-- HEADER -->
@@ -1267,6 +1268,8 @@ function showScreen(name) {
   });
   const target = document.getElementById('screen-'+name);
   if (target) { target.style.display = 'block'; target.scrollIntoView({behavior:'smooth',block:'start'}); }
+} const ov = document.getElementById('top-warm-overlay');
+  if (ov) ov.style.display = name === 'top' ? 'block' : 'none';
 }
 
 /* ════════════════════════════════════════
