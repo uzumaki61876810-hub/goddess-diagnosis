@@ -1267,8 +1267,7 @@ function showScreen(name) {
     if (el) el.style.display = 'none';
   });
   const target = document.getElementById('screen-'+name);
-  if (target) { target.style.display = 'block'; target.scrollIntoView({behavior:'smooth',block:'start'}); }
-} const ov = document.getElementById('top-warm-overlay');
+  if (target) { target.style.display = 'block'; target.scrollIntoView({behavior:'smooth',block:'start'}); } onst ov = document.getElementById('top-warm-overlay');
   if (ov) ov.style.display = name === 'top' ? 'block' : 'none';
 }
 
