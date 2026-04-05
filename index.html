@@ -604,6 +604,10 @@
         </div>
       </div>
       <button class="btn btn-primary" onclick="showScreen('birth')">診断をはじめる ✦</button>
+    <div id="resume-banner" style="display:none;margin-top:16px;padding:14px 16px;border:1px solid var(--gold-dim);border-radius:2px;text-align:center;background:rgba(201,168,76,0.05);">
+      <div style="font-size:12px;color:var(--gold-dim);margin-bottom:10px;">✦ 前回の診断データが残っています</div>
+      <button class="btn btn-secondary" style="margin:0;" onclick="resumeDiagnosis()">診断結果を確認する ✦</button>
+    </div>
     </div>
 
     <!-- HISTORY -->
@@ -1750,6 +1754,21 @@ function buyPremium() {
   window.location.href = STRIPE_URL;
 }
 
+function resumeDiagnosis() {
+  const raw = localStorage.getItem('gd_pending');
+  if (!raw) return;
+  try {
+    const saved = JSON.parse(raw);
+    state.zodiacIndex = saved.zodiacIndex;
+    state.moonZodiacIndex = saved.moonZodiacIndex;
+    state.healthScore = saved.healthScore;
+    state.quizScore = saved.quizScore;
+    renderResult();
+    renderStripePanel();
+    showScreen('result');
+  } catch(e) { console.error(e); }
+}
+
 function checkPaymentReturn() {
   const p = new URLSearchParams(window.location.search);
   if (p.get('gd_paid') !== 'true') return false;
@@ -2000,7 +2019,13 @@ function retake() {
 window.onload = () => {
   loadHistory();
   const handled = checkPaymentReturn();
-  if (!handled) showScreen('top');
+  if (!handled) {
+    showScreen('top');
+    if (localStorage.getItem('gd_pending')) {
+      const b = document.getElementById('resume-banner');
+      if (b) b.style.display = 'block';
+    }
+  }
 };
 </script>
 </body>
