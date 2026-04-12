@@ -1675,7 +1675,8 @@ const STRIPE_URL = 'https://buy.stripe.com/9B6cN64xHfYUb2o4a0d3i00';
 
 function isPremiumUnlocked() {
   return sessionStorage.getItem('gd_premium') === 'true'
-      || localStorage.getItem('gd_premium_session') === String(state.zodiacIndex);
+      || localStorage.getItem('gd_premium_session') === String(state.zodiacIndex)
+      || localStorage.getItem('gd_paid_credit') === 'true';
 }
 
 function renderStripePanel() {
@@ -1755,7 +1756,18 @@ function checkPaymentReturn() {
   if (p.get('gd_paid') !== 'true') return false;
   history.replaceState({}, '', window.location.pathname);
   const raw = localStorage.getItem('gd_pending');
-  if (!raw) return false;
+  if (!raw) {
+    // 支払いは確認済みだがセッションデータが消えている場合
+    // 次回診断完了時に自動アンロックされるクレジットを保存
+    localStorage.setItem('gd_paid_credit', 'true');
+    showScreen('top');
+    const banner = document.getElementById('resume-banner');
+    if (banner) {
+      banner.innerHTML = '<span>✅ お支払いありがとうございます。もう一度診断を完了するとPDFを受け取れます。</span>';
+      banner.style.display = 'flex';
+    }
+    return true;
+  }
   try {
     const saved = JSON.parse(raw);
     state.zodiacIndex = saved.zodiacIndex;
@@ -1773,6 +1785,12 @@ function checkPaymentReturn() {
 }
 
 function downloadPDF(isPremium) {
+  // 支払い済みクレジットを消費（PDF受け取り後はクリア）
+  if (isPremium && localStorage.getItem('gd_paid_credit') === 'true') {
+    localStorage.setItem('gd_premium_session', String(state.zodiacIndex));
+    localStorage.removeItem('gd_paid_credit');
+    sessionStorage.setItem('gd_premium', 'true');
+  }
   const z = ZODIAC_DATA[state.zodiacIndex];
   const moonIdx = state.moonZodiacIndex >= 0 ? state.moonZodiacIndex : state.zodiacIndex;
   const mz = ZODIAC_DATA[moonIdx];
