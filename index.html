@@ -12,9 +12,9 @@
     --paper: #f5f0e8;
     --gold: #c9a84c;
     --gold-light: #e8c97a;
-    --gold-dim: #7a6330;
+    --gold-dim: #a08840;
     --crimson: #8b1a2c;
-    --mist: #c8d4d8;
+    --mist: #d4dfe3;
     --void: #090710;
     --shine: rgba(201,168,76,0.15);
     --grad1: linear-gradient(135deg, #0d0a12 0%, #1a1228 50%, #0a0d1a 100%);
@@ -116,8 +116,8 @@
 
   /* ─── CARD ─── */
   .card {
-    background:rgba(13,10,18,0.7);
-    border:1px solid rgba(201,168,76,0.2);
+    background:rgba(22,16,34,0.82);
+    border:1px solid rgba(201,168,76,0.28);
     border-radius:2px;
     padding:32px;
     margin-bottom:24px;
@@ -155,7 +155,7 @@
   /* ─── FORM ELEMENTS ─── */
   label {
     display:block;
-    font-size:13px;
+    font-size:14px;
     color:var(--mist);
     margin-bottom:6px;
     letter-spacing:0.1em;
@@ -205,16 +205,16 @@
   .question-block:last-child { border-bottom:none; }
   .q-num {
     font-family:'Cinzel Decorative', serif;
-    font-size:10px;
+    font-size:11px;
     color:var(--gold-dim);
     letter-spacing:0.2em;
-    margin-bottom:6px;
+    margin-bottom:8px;
   }
   .q-text {
     font-family:'Noto Serif JP', serif;
-    font-size:15px;
-    line-height:1.8;
-    margin-bottom:14px;
+    font-size:16px;
+    line-height:1.9;
+    margin-bottom:16px;
     color:var(--paper);
   }
   .likert {
@@ -232,13 +232,13 @@
   .likert input[type=radio] { display:none; }
   .likert .l-box {
     display:block;
-    padding:8px 4px;
+    padding:10px 4px;
     border:1px solid rgba(201,168,76,0.2);
     border-radius:1px;
-    font-size:11px;
+    font-size:13px;
     color:var(--mist);
     transition:all 0.2s;
-    line-height:1.3;
+    line-height:1.4;
   }
   .likert input[type=radio]:checked + .l-box {
     background:var(--gold);
@@ -259,9 +259,9 @@
   }
   .quiz-q {
     font-family:'Noto Serif JP', serif;
-    font-size:14px;
-    line-height:1.8;
-    margin-bottom:12px;
+    font-size:15px;
+    line-height:1.9;
+    margin-bottom:14px;
     color:var(--paper);
   }
   .quiz-opts { display:flex; flex-direction:column; gap:8px; }
@@ -270,11 +270,11 @@
     align-items:center;
     gap:10px;
     cursor:pointer;
-    padding:8px 12px;
-    border:1px solid rgba(201,168,76,0.1);
+    padding:10px 14px;
+    border:1px solid rgba(201,168,76,0.15);
     transition:all 0.2s;
     margin:0;
-    font-size:13px;
+    font-size:14px;
     color:var(--mist);
   }
   .quiz-opts label:hover { border-color:var(--gold-dim); color:var(--paper); }
@@ -394,7 +394,7 @@
     text-align:center;
   }
   .result-box-label {
-    font-size:11px;
+    font-size:12px;
     color:var(--gold-dim);
     letter-spacing:0.2em;
     margin-bottom:8px;
@@ -405,7 +405,7 @@
     color:var(--gold-light);
     font-weight:500;
   }
-  .result-box-sub { font-size:12px; color:var(--mist); margin-top:4px; }
+  .result-box-sub { font-size:13px; color:var(--mist); margin-top:4px; }
 
   .growth-path {
     padding:20px 24px;
@@ -414,7 +414,7 @@
     background:rgba(201,168,76,0.03);
   }
   .growth-path-title {
-    font-size:12px;
+    font-size:13px;
     color:var(--gold-dim);
     letter-spacing:0.2em;
     margin-bottom:12px;
@@ -428,7 +428,7 @@
   }
   .growth-step.current { color:var(--gold); font-weight:500; }
   .growth-step.next { color:var(--mist); }
-  .growth-step.future { color:rgba(200,212,216,0.4); }
+  .growth-step.future { color:rgba(200,212,216,0.6); }
   .arrow { color:var(--gold-dim); }
 
   .health-bar {
@@ -436,7 +436,7 @@
     padding:16px 20px;
     border:1px solid rgba(201,168,76,0.15);
   }
-  .health-label { font-size:12px; color:var(--mist); margin-bottom:10px; letter-spacing:0.1em; }
+  .health-label { font-size:13px; color:var(--mist); margin-bottom:10px; letter-spacing:0.1em; }
   .health-track {
     height:6px;
     background:rgba(255,255,255,0.05);
@@ -459,11 +459,11 @@
 
   .message-box {
     padding:24px;
-    border:1px solid rgba(201,168,76,0.2);
-    background:rgba(201,168,76,0.04);
+    border:1px solid rgba(201,168,76,0.25);
+    background:rgba(201,168,76,0.06);
     font-family:'Noto Serif JP', serif;
-    font-size:14px;
-    line-height:2;
+    font-size:15px;
+    line-height:2.1;
     color:var(--paper);
     margin:20px 0;
     position:relative;
@@ -571,7 +571,6 @@
 </style>
 </head>
 <body>
-<div id="top-warm-overlay" style="position:fixed;inset:0;background:linear-gradient(160deg,rgba(40,70,48,0.55) 0%,rgba(28,48,32,0.35) 30%,rgba(15,24,18,0.1) 55%,transparent 75%);pointer-events:none;z-index:1;display:none;transition:opacity 0.6s ease;"></div>
 <div class="container">
 
   <!-- HEADER -->
@@ -605,10 +604,6 @@
         </div>
       </div>
       <button class="btn btn-primary" onclick="showScreen('birth')">診断をはじめる ✦</button>
-    <div id="resume-banner" style="display:none;margin-top:16px;padding:14px 16px;border:1px solid var(--gold-dim);border-radius:2px;text-align:center;background:rgba(201,168,76,0.05);">
-      <div style="font-size:12px;color:var(--gold-dim);margin-bottom:10px;">✦ 前回の診断データが残っています</div>
-      <button class="btn btn-secondary" style="margin:0;" onclick="resumeDiagnosis()">診断結果を確認する ✦</button>
-    </div>
     </div>
 
     <!-- HISTORY -->
@@ -773,7 +768,8 @@
         <div class="stripe-panel" id="stripe-panel"></div>
 
         <div class="btn-row">
-                    <button class="btn btn-secondary" id="btn-premium-pdf" onclick="downloadPDF(true)" style="display:none;">💎 プレミアムPDF</button>
+          <button class="btn btn-secondary" onclick="downloadPDF(false)">📄 無料PDF</button>
+          <button class="btn btn-secondary" id="btn-premium-pdf" onclick="downloadPDF(true)" style="display:none;">💎 プレミアムPDF</button>
           <button class="btn btn-twitter" onclick="shareTwitter()">𝕏 シェア</button>
           <button class="btn btn-secondary" onclick="retake()">再診断</button>
         </div>
@@ -1267,8 +1263,6 @@ function showScreen(name) {
   });
   const target = document.getElementById('screen-'+name);
   if (target) { target.style.display = 'block'; target.scrollIntoView({behavior:'smooth',block:'start'}); }
-  const ov = document.getElementById('top-warm-overlay');
-  if (ov) ov.style.display = name === 'top' ? 'block' : 'none';
 }
 
 /* ════════════════════════════════════════
@@ -1735,27 +1729,6 @@ function renderStripePanel() {
           </div>
         </div>
 
-        
-        <!-- PDFプレビュー -->
-        <div style="margin:22px 0 6px;position:relative;">
-          <div style="font-size:10px;letter-spacing:0.25em;color:var(--gold-dim);text-align:center;margin-bottom:10px;">❖ 診断書プレビュー ❖</div>
-          <div style="position:relative;overflow:hidden;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,0.5);">
-            <div style="background:#f5f0e6;color:#2c2214;padding:16px 16px 70px;font-family:'Noto Serif JP',serif;">
-              <div style="text-align:center;border-bottom:1px solid #d4c9a8;padding-bottom:8px;margin-bottom:12px;">
-                <div style="font-size:8px;letter-spacing:0.4em;color:#9a8a68;">TWELVE GODDESS SOUL DIAGNOSIS</div>
-                <div style="font-size:17px;font-weight:700;color:#2c2214;margin-top:4px;">${z.sun}</div>
-                <div style="font-size:10px;color:#9a8a68;margin-top:2px;">魂の成長診断レポート</div>
-              </div>
-              <div style="font-size:11px;color:#7a6a48;margin-bottom:6px;">◆ あなたへの手紙</div>
-              <p style="font-size:12px;line-height:2;color:#3a3020;margin:0;">${z.letterPreview || z.message}</p>
-            </div>
-            <div style="position:absolute;bottom:0;left:0;right:0;height:130px;background:linear-gradient(to bottom,transparent 0%,rgba(9,7,16,0.92) 75%,rgba(9,7,16,1) 100%);pointer-events:none;"></div>
-            <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;pointer-events:none;">
-              <div style="font-size:18px;">🔒</div>
-              <div style="font-size:10px;color:rgba(201,168,76,0.9);letter-spacing:0.15em;margin-top:3px;">PDFで全文・覚醒の儀式を受け取る</div>
-            </div>
-          </div>
-        </div>
         <!-- 購入ボタン -->
         <div style="text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);">
           <p style="font-size:13px;color:var(--mist);margin-bottom:12px;">手紙の全文・課題2・3・覚醒の儀式をPDFで受け取る</p>
@@ -1775,21 +1748,6 @@ function buyPremium() {
     quizScore: state.quizScore
   }));
   window.location.href = STRIPE_URL;
-}
-
-function resumeDiagnosis() {
-  const raw = localStorage.getItem('gd_pending');
-  if (!raw) return;
-  try {
-    const saved = JSON.parse(raw);
-    state.zodiacIndex = saved.zodiacIndex;
-    state.moonZodiacIndex = saved.moonZodiacIndex;
-    state.healthScore = saved.healthScore;
-    state.quizScore = saved.quizScore;
-    renderResult();
-    renderStripePanel();
-    showScreen('result');
-  } catch(e) { console.error(e); }
 }
 
 function checkPaymentReturn() {
@@ -2042,13 +2000,7 @@ function retake() {
 window.onload = () => {
   loadHistory();
   const handled = checkPaymentReturn();
-  if (!handled) {
-    showScreen('top');
-    if (localStorage.getItem('gd_pending')) {
-      const b = document.getElementById('resume-banner');
-      if (b) b.style.display = 'block';
-    }
-  }
+  if (!handled) showScreen('top');
 };
 </script>
 </body>
