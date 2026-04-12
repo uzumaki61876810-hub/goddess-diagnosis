@@ -2003,11 +2003,33 @@ function downloadPDF(isPremium) {
   `;
 
   const html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><style>${css}</style></head><body>${body}</body></html>`;
-  const w = window.open('','_blank','width=900,height=800');
-  if(!w){alert('ポップアップがブロックされています。ブラウザの設定を確認してください。');return;}
-  w.document.write(html);
-  w.document.close();
-  setTimeout(()=>{w.focus();w.print();},600);
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    // モバイル：Blob URLで同タブに開きPDF保存方法を案内
+    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(9,7,16,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;';
+    overlay.innerHTML = `
+      <div style="font-size:28px;margin-bottom:16px;">📄</div>
+      <div style="font-family:\'Noto Serif JP\',serif;font-size:16px;color:#c9a84c;margin-bottom:12px;letter-spacing:0.1em;">診断書を受け取る</div>
+      <div style="font-size:13px;color:#c8d4d8;line-height:1.9;margin-bottom:24px;">
+        下のボタンで診断書を開いてから<br>
+        <strong style="color:#fff;">ブラウザの「共有」→「印刷」→「PDFで保存」</strong><br>
+        の順に操作してください。
+      </div>
+      <a href="${url}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#a08840,#c9a84c);color:#0d0a12;font-family:\'Noto Serif JP\',serif;font-size:15px;font-weight:700;padding:14px 36px;border-radius:2px;text-decoration:none;margin-bottom:16px;">診断書を開く</a>
+      <button onclick="this.parentNode.remove()" style="background:transparent;border:1px solid rgba(201,168,76,0.3);color:#c8d4d8;font-family:\'Noto Serif JP\',serif;font-size:13px;padding:8px 24px;cursor:pointer;">閉じる</button>
+    `;
+    document.body.appendChild(overlay);
+  } else {
+    // デスクトップ：ポップアップで印刷
+    const w = window.open('','_blank','width=900,height=800');
+    if(!w){alert('ポップアップがブロックされています。ブラウザの設定を確認してください。');return;}
+    w.document.write(html);
+    w.document.close();
+    setTimeout(()=>{w.focus();w.print();},600);
+  }
 }
 
 function retake() {
