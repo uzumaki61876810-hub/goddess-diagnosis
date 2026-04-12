@@ -1485,6 +1485,13 @@ function calcResult() {
    RENDER RESULT
 ════════════════════════════════════════ */
 function renderResult() {
+  // 診断データをバックアップ保存（支払い後のセッション消失対策）
+  localStorage.setItem('gd_last_result', JSON.stringify({
+    zodiacIndex: state.zodiacIndex,
+    moonZodiacIndex: state.moonZodiacIndex,
+    healthScore: state.healthScore,
+    quizScore: state.quizScore
+  }));
   const z = ZODIAC_DATA[state.zodiacIndex];
 
   // Determine "current" goddess based on answer pattern
@@ -1755,7 +1762,7 @@ function checkPaymentReturn() {
   const p = new URLSearchParams(window.location.search);
   if (p.get('gd_paid') !== 'true') return false;
   history.replaceState({}, '', window.location.pathname);
-  const raw = localStorage.getItem('gd_pending');
+  const raw = localStorage.getItem('gd_pending') || localStorage.getItem('gd_last_result');
   if (!raw) {
     // 支払いは確認済みだがセッションデータが消えている場合
     // 次回診断完了時に自動アンロックされるクレジットを保存
